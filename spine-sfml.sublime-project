@@ -1,0 +1,92 @@
+{
+	"build_systems":
+	[
+		{
+			"name": "🤍CMake Generate -> MinGW Makefiles",
+			"working_dir": "${project_path}/build",
+			"encoding": "gbk",
+			"quiet": true,
+			"shell_cmd": "cmake -H. -S../dependencies/SFML-2.4.1-vc14-64-bit/../../ -G \"MinGW Makefiles\"",
+			"env":
+			{
+				"PATH": "c:/MinGW/bin/;%PATH%"
+			},
+			"file_regex": "^(.+)\\((\\d+)\\)(): ((?:fatal )?(?:error|warning|note) \\w+\\d\\d\\d\\d): (.*)$",
+			"variants":
+			[
+				{
+					"shell_cmd": "make --version && g++ --version && make help",
+					"name": "Make help"
+				},
+				{
+					"name": "clean",
+					"shell_cmd": "make clean"
+				},
+				{
+					"name": "clear all",
+					"shell_cmd": "del * /s /q"
+				},
+				{
+					"name": "Make",
+					"shell_cmd": "make -j 10 all"
+				},
+				{
+					"name": "Make install",
+					"shell_cmd": "make install"
+				},
+				{
+					"name": "Make test",
+					"shell_cmd": "make -j 10 && make test"
+				}
+			]
+		},
+		{
+			"name": "💛CMake Generate -> Ninja (Windows)",
+			"working_dir": "${project_path}/build",
+			"encoding": "gbk",
+			"quiet": true,
+			"cmd": ["echo", "shell_cmd cause this command disabled!"],
+			"shell_cmd": "%VCVARS64% x64 && cmake -H. -S../dependencies/SFML-2.4.1-vc14-64-bit/../../ -DCMAKE_VERBOSE_MAKEFILE=ON -G \"Sublime Text 2 - Ninja\"",
+			"env":
+			{
+				"PATH": "c:/MinGW/bin/;%PATH%",
+				"VCVARS64": "\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvars64.bat\"",
+			},
+			// for MSVC Compiler message process
+			"file_regex": "^(.+)\\((\\d+)\\): ((?:fatal )?(?:error|warning|note) \\w+): (.*)$",
+			// for GCC Compiler message process
+			// "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+			"variants":
+			[
+				{
+					"name": "Ninja - all",
+					"shell_cmd": "%VCVARS64% x64 && ninja.exe -f build.ninja all && echo Done!"
+				},
+				{
+					"name": "Ninja - clean",
+					"shell_cmd": "ninja.exe -f build.ninja clean"
+				},
+				{
+					"name": "Ninja - rebuild_cache",
+					"shell_cmd": "ninja.exe -f build.ninja rebuild_cache"
+				},
+				{
+					"name": "Ninja - test",
+					"shell_cmd": "ninja.exe -f build.ninja test"
+				},
+				{
+					"name": "Ninja - edit_cache",
+					"shell_cmd": "ninja.exe -f build.ninja edit_cache"
+				}
+			]
+		},
+	],
+	"folders":
+	[
+		{
+			"binary_file_patterns": [ "*.nothing" ],
+			"name": "☾ SFML Demo Project",
+			"path": "."
+		}
+	]
+}
