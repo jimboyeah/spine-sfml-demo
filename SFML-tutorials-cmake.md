@@ -176,7 +176,7 @@ CMake 可以和 Sublime 配合工作，执行以下命令就会为工程生成 .
 
 实际使用时不会直接使用生成的 Sublime 项目文件，而是直接配置自己的项目文件：
 
-![build-tools](images\build-tools.jpg)
+![build-tools](https://github.com/jimboyeah/spine-sfml-demo/blob/master/images/build-tools.jpg)
 
 为了方便执行命令，在工程配置文件中指定了命令行工作目录设置 `working_dir`，执行 CMake 生成脚本时，就会在此目录下保存。注意，如何不存在此目录，命令不会被执行，可以直接设置为工程目录 *${project_path}*。
 
