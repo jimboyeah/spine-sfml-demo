@@ -23,7 +23,7 @@ int main()
     window.create(sf::VideoMode(2048, 1024, desktop.bitsPerPixel), "SFML win");
 
     sf::Font font;
-    if (!font.loadFromFile("c:\\windows\\fonts\\arial.ttf")) {
+    if (!font.loadFromFile("c:\\windows\\fonts\\AdobeSongStd-Light.otf")) {
         // error 
     }
 
@@ -54,16 +54,16 @@ int main()
         if (angle>36) angle = 0;
 
         text.setOrigin(sf::Vector2f(12, 12));
-        text.setPosition(sf::Vector2f(2048/2-300, 1024/2-12));
+        text.setPosition(sf::Vector2f(2048/2+300, 1024/2-12));
         text.setScale(sf::Vector2f(angle, angle));
         text.setRotation(angle * 10);
-        text.setString("A!");
+        text.setString(L"יטאח");
         window.draw(text);
         text.setOrigin(sf::Vector2f(12, 12));
         text.setPosition(sf::Vector2f(2048/2-150, 1024/2-12));
         text.setScale(sf::Vector2f(angle, angle));
         text.setRotation(angle * 10);
-        text.setString("B!");
+        text.setString(L"יטאח");
         window.draw(text);
 
         window.display();

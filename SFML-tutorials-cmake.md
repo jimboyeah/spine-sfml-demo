@@ -261,6 +261,10 @@ sublime 工程文件配置参考 spine-sfml.sublime-project 如下：
                     "shell_cmd": "%VCVARS64% x64 && ninja.exe -f build.ninja all && echo Done!"
                 },
                 {
+                    "name": "CMake --install",
+                    "shell_cmd": "cmake --install ."
+                },
+                {
                     "name": "Ninja - clean",
                     "shell_cmd": "ninja.exe -f build.ninja clean"
                 },
