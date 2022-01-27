@@ -13,6 +13,7 @@ target
 *.user
 *.zip
 *.sublime-workspace
+*.stackdump
 .DS_Store
 
 .idea/

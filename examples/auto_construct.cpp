@@ -12,13 +12,9 @@ public:
     string name = "Grace";
 };
 
+class House { };
 
 // Implementations
-class House 
-{
-
-};
-
 Grace::Grace(House h)
 {
     cout << "Grace(House)" << endl;

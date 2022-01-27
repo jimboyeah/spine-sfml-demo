@@ -41,6 +41,61 @@
 			]
 		},
 		{
+			"name": "❤GCC Compiler",
+			"working_dir": "${project_path}/build",
+			"encoding": "gbk",
+			"quiet": true,
+			"cmd": ["echo", "shell_cmd cause this command disabled!"],
+			"shell_cmd": "where gcc && gcc --version",
+			"env":
+			{
+				"PATH": "c:/MinGW/bin/;%PATH%",
+			},
+			// for GCC Compiler message process
+			"file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (?:error|fatal):(.*)$",
+			"variants":
+			[
+				{
+					"name": "Memory Layout of Class (GCC)",
+					"shell_cmd": "gcc --version && gcc --std=c++11 -fdump-class-hierarchy ${file} -lstdc++ && echo Done with ${file_base_name}.class!"
+				},
+				{
+					"name": "Compile & Run (GCC Debug)",
+					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} -lstdc++ -Og -g -o ${file_base_name} && ${file_base_name}"
+				},
+				{
+					"name": "Compile & Run (GCC Release)",
+					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} -lstdc++ -Os -s -o ${file_base_name} && ${file_base_name}"
+				},
+			]
+		},
+		{
+			"name": "🌷MSVC Compiler",
+			"working_dir": "${project_path}/build",
+			"encoding": "gbk",
+			"quiet": true,
+			"cmd": ["echo", "shell_cmd cause this command disabled!"],
+			"shell_cmd": "%VCVARS64% x64 && where cl.exe",
+			"env":
+			{
+				"PATH": "%PATH%",
+				"VCVARS64": "\"C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Auxiliary/Build/vcvars64.bat\"",
+			},
+			// for MSVC Compiler message process
+			"file_regex": "^(.+)\\((\\d+)\\): ((?:fatal )?(?:error|fatal) \\w+): (.*)$",
+			"variants":
+			[
+				{
+					"name": "Memory Layout of Class (MSVC)",
+					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} /d1reportSingleClassLayout${file_base_name} && ${file_base_name}"
+				},
+				{
+					"name": "Compile & Run (MSVC)",
+					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} && ${file_base_name}"
+				},
+			]
+		},
+		{
 			"name": "💛CMake Generate -> Ninja (Windows)",
 			"working_dir": "${project_path}/build",
 			"encoding": "gbk",
@@ -61,22 +116,6 @@
 				{
 					"name": "Ninja - all",
 					"shell_cmd": "%VCVARS64% x64 && ninja.exe -f build.ninja all && echo Done!"
-				},
-				{
-					"name": "Memory Layout of Class (MSVC)",
-					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} /d1reportSingleClassLayout${file_base_name} && ${file_base_name}"
-				},
-				{
-					"name": "Compile & Run (MSVC)",
-					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} && ${file_base_name}"
-				},
-				{
-					"name": "Memory Layout of Class (GCC)",
-					"shell_cmd": "gcc --version && gcc --std=c++11 -fdump-class-hierarchy ${file} -lstdc++ && echo Done with ${file_base_name}.class!"
-				},
-				{
-					"name": "Compile & Run (GCC)",
-					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} -lstdc++ -g -o ${file_base_name} && ${file_base_name}"
 				},
 				{
 					"name": "CMake install",

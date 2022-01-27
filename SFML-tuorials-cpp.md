@@ -4,11 +4,13 @@
 面向对象三大特征： 
 
 - 封装：Encapsulation，封装和隐藏
+
     - ● 缘由：使用者对定义的属性(成员变量)直接操作会导致数据的错误、混乱或安全性问题
     - ● 办法：隐藏不需要对外提供的实现细节，使用者只能通过事先定制好的方法来访问
     - ● 实现：将属性声明为私有的，再提供公共的方法实现对该属性的操作
 
 - 继承：Inheritance
+
     - ● 多个类中存在相同属性和行为时，将这些内容抽取到一个新类中，多个类无需再定义这些属性和行为，只要继承那个类即可
     - ● 子类会把父类除构造器之外的所有信息给继承下来
     - ● 子父类的概念是相对的（子类也可以作为其他类的父类，父类也可以作为其他类的子类）
@@ -18,13 +20,19 @@
     - ● 作用 ：提高了代码的复用性，让类与类之间产生了关系，提供了多态的前提
 
 - 多态：Polymorphism，指一个事物存在多种形态
+
     - 表现形式：
+
         - ● 方法的重载和重写 overload & override
         - ● 对象的多态性：父类的引用指向子类的对象  如：Person p1 = new Woman();
+
     - 多态的前提：
+
         - ● 继承关系
         - ● 子类重写了父类的方法
-    - 多态在程序运行分为： （编译时“看左边”，运行时“看右边”）
+
+    - 多态在程序运行分为：（编译时“看左边”，运行时“看右边”）
+
         - ● 编译状态 ：关注是父类。子类特有的属性和方法不能被编译通过
         - ● 运行状态 ：关注的是子类（真正对象的实体，子类的对象，那么执行的方法就是子类重写的方法）
 
@@ -33,17 +41,21 @@
 继承过后，子类变得越来越具体，父类则更一般，更通用。有时将父类设计得非常抽象，以至于它没有具体的实例，这样的类叫做抽象类。
 
 抽象类：（可以定义和普通类完全一样的内容）
+
 - ● 语法：`privilege abstract class name { }`
 - ● 不能被实例化，用来被继承。子类必须重写父类的抽象方法，才能被实例化
 - ● 有构造器(所以的类都有构造器)
 - ● 抽象类中不一定有抽象方法
+
 抽象方法：（只有方法的声明，没有方法的实现。在定义抽象方法时没有方法体和 { }，结尾分号结束）
+
 - ● 语法：`privilege abstract void/type name(arguments);`
 - ● 抽象方法所在的类一定是抽象类 
 - ● 子类如果继承的是抽象的父类（有抽象方法），那么子类必须重写父类的所有抽象方法或者子类也是一个抽象类
 - ● 若子类继承抽象类，并重写所有的抽象方法，则此类是一个“实体类”，即可以实例化
 
 接口：interface 是一种特殊的抽象类，是抽象方法和常量值定义的集合，没有具体的实现。
+
 - ● 接口类语法：`privilege interface name { }`
 - ● 常量(成员变量)语法：`public static final type NAME = value;`（其中 public static final 可以省略，为默认）
 - ● 抽象方法语法：`public abstract void/type name(arguments)`（其中 public abstract 可以省略，为默认）
@@ -64,78 +76,82 @@
 
 所谓局部类 local class 就是定义在一个函数内部的类，这个类只能在这个函数内部使用，例子：
 
-    int main()
+```cpp
+int main()
+{
+    class c4
     {
-        class c4
-        {
-        public:
-            int a;
-            void foo() {a = 4;}
-        };
-     
-        class c4 ff;
-        ff.foo();
-        cout << ff.a << endl;
-        return 0;
-    }
+    public:
+        int a;
+        void foo() {a = 4;}
+    };
+ 
+    class c4 ff;
+    ff.foo();
+    cout << ff.a << endl;
+    return 0;
+}
+```
 
 所谓嵌套类，即在类内部定义的类，根据类的访问修饰符决定外部代码是否可以访问：
 
-    #include <cstdio>
-    #include <typeinfo>
+```cpp
+#include <cstdio>
+#include <typeinfo>
 
-    class Base
+class Base
+{
+    class _neasted
     {
-        class _neasted
-        {
-            const char *data = "some secret";
-        public:
-            void test()
-            { 
-                printf("%s\n", typeid(*this).name()); 
-            };
-        };
-
+        const char *data = "some secret";
     public:
-        Base()
-        {
-            _neasted _n;
-            neasted n;
-            printf("Construct %s\n", typeid(*this).name());
-            // error: 'char Base::_neasted::data []' is private within this context
-            // printf("--> Test _neasted: %s\n", _n.data);
-            printf("--> Test neasted: %s\n", n.data);
-        }
-
-        ~Base()
-        {
-            printf("Destructure of %s\n", __FUNCTION__);
-        }
-        
-        class neasted
-        {
-        public:
-            const char *data = "some string";
-            void test()
-            { 
-                printf("%s\n", typeid(*this).name()); 
-            }
+        void test()
+        { 
+            printf("%s\n", typeid(*this).name()); 
         };
     };
 
-
-    int main()
+public:
+    Base()
     {
-        Base();
-
-        // error: 'class Base::_neasted' is private within this context
-        // Base::_neasted _n;
-        Base::neasted n;
-        printf("%s:\n", __FUNCTION__);
+        _neasted _n;
+        neasted n;
+        printf("Construct %s\n", typeid(*this).name());
+        // error: 'char Base::_neasted::data []' is private within this context
+        // printf("--> Test _neasted: %s\n", _n.data);
         printf("--> Test neasted: %s\n", n.data);
-
-        return 0;
     }
+
+    ~Base()
+    {
+        printf("Destructure of %s\n", __FUNCTION__);
+    }
+    
+    class neasted
+    {
+    public:
+        const char *data = "some string";
+        void test()
+        { 
+            printf("%s\n", typeid(*this).name()); 
+        }
+    };
+};
+
+
+int main()
+{
+    Base();
+
+    // error: 'class Base::_neasted' is private within this context
+    // Base::_neasted _n;
+    Base::neasted n;
+    printf("%s:\n", __FUNCTION__);
+    printf("--> Test neasted: %s\n", n.data);
+
+    return 0;
+}
+```
 
 
 ## ⚡ Friend & Access Control
@@ -194,14 +210,16 @@ Table 14.1 Varieties of Inheritance 展示了各种基本继承关系中父类�
 
 友元的声明只能出现在类声明内，通常，将友元声明成组地放在类定义的开始或结尾是个好主意。声明友元后，就表示信任友元对自身的私密数据或成员进行访问：
 
-    class MyFiends {
-        friend void set_show(int x, A &a);
-        friend void B::set_show(int x, A &a);
-        friend class C;
-        friend int main();
-    private:
-        int something_for_my_friend;
-    }
+```cpp
+class MyFiends {
+    friend void set_show(int x, A &a);
+    friend void B::set_show(int x, A &a);
+    friend class C;
+    friend int main();
+private:
+    int something_for_my_friend;
+}
+```
 
 友元关系不可继承、不可传递、不可交换，构造函数不能作为友元，友友不分 public/proteced/private。但是为了方便文档的构建，通常应该在 public 下声明，因为文档构建时可能忽略保护、私有的成员。
 
@@ -213,139 +231,143 @@ Table 14.1 Varieties of Inheritance 展示了各种基本继承关系中父类�
 
 类、成员、函数友元用法示范：
 
-    #include <iostream>
-    #include <string>
+```cpp
+#include <iostream>
+#include <string>
 
-    using namespace std;
+using namespace std;
 
-    // Declarations
-    class House;
-    class Jack;
-    class Grace
+// Declarations
+class House;
+class Jack;
+class Grace
+{
+public:
+    void tryAccess(House h);
+};
+
+
+// Implementations
+class House 
+{
+    friend class Jack;
+    friend void Funky(House);
+    friend void Grace::tryAccess(House);
+public:
+    string outdoor = "outside of the House.";
+protected: 
+    // accessible for friend
+    string indoor = "inside of the House.";
+private:
+    // accessible for friend
+    string bedroom = "inside of the Bedroom!";
+};
+
+class Jack
+{
+public:
+    Jack(House h)
     {
-    public:
-        void tryAccess(House h);
-    };
-
-
-    // Implementations
-    class House 
-    {
-        friend class Jack;
-        friend void Funky(House);
-        friend void Grace::tryAccess(House);
-    public:
-        string outdoor = "outside of the House.";
-    protected: 
-        // accessible for friend
-        string indoor = "inside of the House.";
-    private:
-        // accessible for friend
-        string bedroom = "inside of the Bedroom!";
-    };
-
-    class Jack
-    {
-    public:
-        Jack(House h)
-        {
-            cout << "Jack is " << h.outdoor << "\n";
-            cout << "Jack is " << h.indoor << "\n";
-            cout << "Jack is " << h.bedroom << "\n";
-        }
-    };
-
-    class Son: public Jack 
-    {
-        Son(House h): Jack(h)
-        {
-            cout << "Jack's son is " << h.outdoor << "\n";
-            // unaccessable
-            // cout << "Jack's son is " << h.indoor << "\n";
-            // cout << "Jack's son is " << h.bedroom << "\n";
-        }
-    };
-
-    void Grace::tryAccess(House h)
-    {
-        cout << "Grace is " << h.outdoor << "\n";
-        cout << "Grace is " << h.indoor << "\n";
-        cout << "Grace is " << h.bedroom << "\n";
+        cout << "Jack is " << h.outdoor << "\n";
+        cout << "Jack is " << h.indoor << "\n";
+        cout << "Jack is " << h.bedroom << "\n";
     }
+};
 
-    void Funky(House h)
+class Son: public Jack 
+{
+    Son(House h): Jack(h)
     {
-        cout << "Funky is " << h.outdoor << "\n";
-        cout << "Funky is " << h.indoor << "\n";
-        cout << "Funky is " << h.bedroom << "\n";
+        cout << "Jack's son is " << h.outdoor << "\n";
+        // unaccessable
+        // cout << "Jack's son is " << h.indoor << "\n";
+        // cout << "Jack's son is " << h.bedroom << "\n";
     }
+};
 
-    int main(void)
-    {
-        House h;
-        Jack j(h);
-        Grace g;
-        g.tryAccess(h);
-        Funky(h);
-        return EXIT_SUCCESS;
-    }
+void Grace::tryAccess(House h)
+{
+    cout << "Grace is " << h.outdoor << "\n";
+    cout << "Grace is " << h.indoor << "\n";
+    cout << "Grace is " << h.bedroom << "\n";
+}
+
+void Funky(House h)
+{
+    cout << "Funky is " << h.outdoor << "\n";
+    cout << "Funky is " << h.indoor << "\n";
+    cout << "Funky is " << h.bedroom << "\n";
+}
+
+int main(void)
+{
+    House h;
+    Jack j(h);
+    Grace g;
+    g.tryAccess(h);
+    Funky(h);
+    return EXIT_SUCCESS;
+}
+```
 
 下面代码中，基类 B 定义了三种访问权限的成员方法，在 B 在中任一个方法中都可以调用 apple、pie、pine 三个成员方法。而 X、Y、Z 分别以三种限继承 B，X、Y、Z 类的继承方法不同，使得它们的子类对基类 B 的成员方法有不同的访问权限，但在 X、Y、Z 内不可访问的方法只有 pine 这个私有方法。N 类继承了 Z 类，由于 Z 类的私有继承使得 N 类对基类 B 的所有成员都不具有访问权限。
 
 在类外部环境中，即 main 函数中只有 B 类及子类 X 可以访问 apple() 方法。C++ 中没有 super 或 parent 等关键字，想要调父类方法，只能以两个冒号指定父类名称及方法名 B::apple() 这种方式调用。
 
-    #include <iostream>
+```cpp
+#include <iostream>
 
-    class B {
-        // 公有成员方法允许子类访问
-        public: void apple() {
-            std::cout << "B::apple() is called" << std::endl; 
-        }
-
-        // 保护成员方法不允许私有继承的子类访问
-        protected: void pie() {
-            std::cout << "B::pie() is called" << std::endl; 
-        }
-
-        // 私有成员方法只允许友元子类访问
-        private: void pine() {
-            std::cout << "B::pine() is called" << std::endl; 
-        }
-
-        friend class F; // 友元类声明
-    };
-
-    class X: public    B { 
-        /* 公有继承不可访问基类私有方法 pine() */ 
-    };
-
-    class Y: protected B { 
-        /* 保护继承，基类公有成员将降级为保护成员，不可访问基类私有方法 pine() */ 
-    };
-
-    class Z: private   B { 
-        /* 私有继承将隐藏基类，不暴露给下一级代码 */ 
-        // public: Z(){ B::pie(); }
-    };
-
-    class N: public Z { 
-        // 不可访问私有继承的基类 apple() pie() pine() 
-        // public: N(){ B::apple(); }
-    };
-
-    class F: private B { 
-        // 友元类可访问基类私有方法
-        public: F(){ B::pine(); }
-    };
-
-    int main()
-    {
-        X x; Y y; Z z; N n; F f;
-        x.apple();
-        // x.pie();   // 不可外部访问保护成员
-        // y.apple(); // 不可访问保护继承的基类
-        // z.apple(); // 不可访问私有继承的基类
+class B {
+    // 公有成员方法允许子类访问
+    public: void apple() {
+        std::cout << "B::apple() is called" << std::endl; 
     }
+
+    // 保护成员方法不允许私有继承的子类访问
+    protected: void pie() {
+        std::cout << "B::pie() is called" << std::endl; 
+    }
+
+    // 私有成员方法只允许友元子类访问
+    private: void pine() {
+        std::cout << "B::pine() is called" << std::endl; 
+    }
+
+    friend class F; // 友元类声明
+};
+
+class X: public    B { 
+    /* 公有继承不可访问基类私有方法 pine() */ 
+};
+
+class Y: protected B { 
+    /* 保护继承，基类公有成员将降级为保护成员，不可访问基类私有方法 pine() */ 
+};
+
+class Z: private   B { 
+    /* 私有继承将隐藏基类，不暴露给下一级代码 */ 
+    // public: Z(){ B::pie(); }
+};
+
+class N: public Z { 
+    // 不可访问私有继承的基类 apple() pie() pine() 
+    // public: N(){ B::apple(); }
+};
+
+class F: private B { 
+    // 友元类可访问基类私有方法
+    public: F(){ B::pine(); }
+};
+
+int main()
+{
+    X x; Y y; Z z; N n; F f;
+    x.apple();
+    // x.pie();   // 不可外部访问保护成员
+    // y.apple(); // 不可访问保护继承的基类
+    // z.apple(); // 不可访问私有继承的基类
+}
+```
 
 上面还将 F 类作为友元引入到 A 类中，这样在 F 类中可以访问 A 类的任意成员，就像是自己的家一样，还可以将 main 函数作为友元引入 A 类，这样在 main 方法中也像在 A 类内一样访问其私有成员。
 
@@ -372,16 +394,17 @@ C++ 中有几个常让初学者搞不清晰的术语，通过虚函数表的解�
 
 C++11 规范引入了 *override* 和 *final* 关键字，主要作用是提示，在我们下面的代码中有没有发现什么问题呢？
 
-    class Base {
-    public:
-        virtual void print(void){...}
-    };
+```cpp
+class Base {
+public:
+    virtual void print(void){...}
+};
 
-    class Derived : public Base {
-    public:
-        void pirnt(void){...}
-    };
-
+class Derived : public Base {
+public:
+    void pirnt(void){...}
+};
+```
 
 额...原来在 Derived 中将 print 误输入为 pirnt，关键问题是编译器完全可以正确的编译上面的代码，这是一个很难发现的错误。
 
@@ -652,8 +675,6 @@ private:
 };
 ```
 
-
-
 ## ⚡ Virtual & Polymorphism 虚拟与多态机制
 - Polymorphism in C++ https://www.tutorialspoint.com/cplusplus/cpp_polymorphism.htm
 - Hands-On Design Patterns With C++ by Fedor G. Pikus - Chapter 1: An Introduction to Inheritance and Polymorphism
@@ -737,25 +758,25 @@ If it looks like a duck, swims like a duck, and quacks like a duck, then it prob
 以下代码可以用来测试构造函数和析构的执行顺序：
 
 ```cpp
+#include <iostream>
+
+class A { public: A(){ std::cout << "A() ";} };
+class B : public A { public: B(){ std::cout << "B() ";} };
+class C : public B { public: C(){ std::cout << "C() ";} };
+class X { public: X(){ std::cout << "X() ";} };
+class Y { public: Y(){ std::cout << "Y() ";} };
+class Z : public X, public Y { public: Z(){ std::cout << "Z() ";} };
+class MI : public C, public Z { public: MI(){ std::cout << "MI() ";} };
+class MIV : public C, virtual public Z { public: MIV(){ std::cout << "MIV() ";} };
+
+int main()
+{
+    std::cout << "\n======nonvirtual inheritence=======\n";
+    MI mi;
+    std::cout << "\n========virtual inheritence========\n";
+    MIV miv;
+}
 ```
-    #include <iostream>
-
-    class A { public: A(){ std::cout << "A() ";} };
-    class B : public A { public: B(){ std::cout << "B() ";} };
-    class C : public B { public: C(){ std::cout << "C() ";} };
-    class X { public: X(){ std::cout << "X() ";} };
-    class Y { public: Y(){ std::cout << "Y() ";} };
-    class Z : public X, public Y { public: Z(){ std::cout << "Z() ";} };
-    class MI : public C, public Z { public: MI(){ std::cout << "MI() ";} };
-    class MIV : public C, virtual public Z { public: MIV(){ std::cout << "MIV() ";} };
-
-    int main()
-    {
-        std::cout << "\n======nonvirtual inheritence=======\n";
-        MI mi;
-        std::cout << "\n========virtual inheritence========\n";
-        MIV miv;
-    }
 
 Output: 
 
@@ -779,7 +800,7 @@ Output:
 
 参考 The C++ Programming Language 3rd/4th 两个版本中关于 Class Hierarchies 的两个示范代码：
 
-```js
+```cpp
 class A {                  /*no constructor*/ };
 class B { public: B();     /*default constructor*/ };
 class C { public: C(int) ; /*no default constructor*/ };
@@ -1053,7 +1074,7 @@ public:
 根据使用的继承机制不同，编译器不实现差异，类数据内存布局明显有变化，主要包含了：
 
 - vftable 虚函数表：包含虚函数的列表数据结构；
-- vbtable 虚基类表：继承链上所有虚基类都通过一张表管理；
+- vbtable 虚基类表：继承链上所有路径上共同的虚基类都通过一张表管理；
 - vfptr 虚函数指针：指向虚函数表中的首条目；
 - vbptr 虚基类指针：指向虚基类副本，在使用虚继承时产生；
 - this adjustor 上下文指针调整：继承结构中，有各种类实例对象需要使用 this 指针来访问成员，根据进行偏移地址调整；
@@ -1288,3 +1309,4 @@ GCC 编译器，可以使用 -fdump-class-hierarchy 选项进行编译会得到�
     48    (int (*)(...))VMan2::_ZTv0_n12_NK5VMan22vfEv
     52    0u
     56    0u
+
