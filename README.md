@@ -54,6 +54,7 @@ SFML - Simple and Fast Multimedia 是一个轻量的跨平台图形编程框架�
     - ✔[auto_ptr to unique_ptr 独占智能指针](./SFML-tuorials-smart-pointer.md#-auto_ptr-to-unique_ptr)
     - ✔[shared_ptr & weak_ptr 共享智能指针](./SFML-tuorials-smart-pointer.md#-shared_ptr--weak_ptr-共享智能指针)
 
+准备添加 GDB 与 Class Layout 的相关内容。
 
 ## SFML Framework 入门教程
 
