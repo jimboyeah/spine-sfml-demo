@@ -3,6 +3,11 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+using namespace std;
+
+// with C++20 to support using enum XXX
+// using enum sf::Event::EventType;
+
 int main()
 {
     sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
@@ -20,10 +25,10 @@ int main()
     }
     // Create a window with the same pixel depth as the desktop
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    window.create(sf::VideoMode(2048, 1024, desktop.bitsPerPixel), "SFML win");
+    window.create(sf::VideoMode(2048, 1024, desktop.bitsPerPixel), "SFML Fullscreen", sf::Style::Fullscreen);
 
     sf::Font font;
-    if (!font.loadFromFile("c:\\windows\\fonts\\AdobeSongStd-Light.otf")) {
+    if (!font.loadFromFile("c:\\windows\\fonts\\msyh.ttf")) {
         // error 
     }
 
@@ -41,7 +46,27 @@ int main()
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+            }
+            else if (event.type == sf::Event::MouseEntered)
+            {
+                cout << "MouseEntered" << endl;
+            }
+            else if (event.type == sf::Event::MouseLeft)
+            {
+                cout << "MouseLeft" << endl;
+            }
+            else if (event.type == sf::Event::MouseMoved)
+            {
+                cout << "MouseMoved: (" 
+                    << event.mouseMove.x << ", " << event.mouseMove.y << ")" << endl;
+            }
+            else if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Escape || event.key.code == sf::Keyboard::X)
+                    window.create(sf::VideoMode(1024, 640, desktop.bitsPerPixel), "SFML Window");
+            }
         }
 
         // RenderWindow methods
@@ -53,13 +78,13 @@ int main()
         angle += 0.005f;
         if (angle>36) angle = 0;
 
-        text.setOrigin(sf::Vector2f(12, 12));
+        text.setOrigin(sf::Vector2f(24, 18));
         text.setPosition(sf::Vector2f(2048/2+300, 1024/2-12));
         text.setScale(sf::Vector2f(angle, angle));
         text.setRotation(angle * 10);
-        text.setString(L"יטאח");
+        text.setString(L"汉语");
         window.draw(text);
-        text.setOrigin(sf::Vector2f(12, 12));
+        text.setOrigin(sf::Vector2f(24, 18));
         text.setPosition(sf::Vector2f(2048/2-150, 1024/2-12));
         text.setScale(sf::Vector2f(angle, angle));
         text.setRotation(angle * 10);

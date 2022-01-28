@@ -10,7 +10,7 @@ int main()
     float angle = 0;
 
     sf::Texture tt;
-    if(!tt.loadFromFile("data\\owl-pma.png")){
+    if(!tt.loadFromFile("cpp\\data\\owl-pma.png")){
         // error;
     }
     sf::Sprite sprite(tt);
