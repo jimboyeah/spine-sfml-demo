@@ -40,6 +40,14 @@ int main()
     text.setStyle(sf::Text::Bold | sf::Text::Underlined);
     float angle = 0;
 
+    char * axes[] = {"The X axis", "The Y axis", "The Z axis", 
+        "The R axis", "The U axis", "The V axis", 
+        "The X axis of PoV", "The Y axis of PoV", "Unknown"};
+    int axesCount = 8;
+
+    float threshold = 0.5;
+    bool keyRepeat = true;
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -48,6 +56,33 @@ int main()
             if (event.type == sf::Event::Closed)
             {
                 window.close();
+            }
+            else if (event.type == sf::Event::JoystickConnected)
+            {
+                cout << "JoystickConnected: " << event.joystickConnect.joystickId << endl;
+            }
+            else if (event.type == sf::Event::JoystickDisconnected)
+            {
+                cout << "JoystickDisconnected: " << event.joystickConnect.joystickId  << endl;
+            }
+            else if (event.type == sf::Event::JoystickMoved)
+            {
+                int axisID = event.joystickMove.axis;
+                char *axis = axes[axisID <= axesCount? axisID:axesCount];
+                cout << "JoystickMoved: " << endl
+                     << "   joystickId: " << event.joystickMove.joystickId << endl
+                     << "         axis: " << axis << endl
+                     << "     position: " << event.joystickMove.position << endl;
+            }
+            else if (event.type == sf::Event::JoystickButtonPressed)
+            {
+                cout << "JoystickButtonPressed: " << endl
+                     << "         button index: " << event.joystickButton.button << endl;
+            }
+            else if (event.type == sf::Event::JoystickButtonReleased)
+            {
+                cout << "JoystickButtonReleased: " << endl
+                     << "          button index: " << event.joystickButton.button << endl;
             }
             else if (event.type == sf::Event::MouseEntered)
             {
@@ -62,10 +97,51 @@ int main()
                 cout << "MouseMoved: (" 
                     << event.mouseMove.x << ", " << event.mouseMove.y << ")" << endl;
             }
+            else if (event.type == sf::Event::MouseButtonPressed)
+            {
+                cout << "MouseButtonPressed: " << endl
+                     << "      button index: " << event.mouseButton.button << endl
+                     << "            (x, y): (" << event.mouseButton.x << ", "
+                     << ", " << event.mouseButton.y << ")" << endl;
+            }
+            else if (event.type == sf::Event::MouseButtonReleased)
+            {
+                cout << "MouseButtonReleased: " << endl
+                     << "      button index: " << event.mouseButton.button << endl
+                     << "            (x, y): (" << event.mouseButton.x << ", "
+                     << ", " << event.mouseButton.y << ")" << endl;
+            }
+            else if (event.type == sf::Event::MouseWheelScrolled)
+            {
+                cout << "MouseWheelScrolled: " << endl
+                     << "             wheel: " << event.mouseWheelScroll.wheel << endl
+                     << "             delta: " << event.mouseWheelScroll.delta << endl
+                     << "            (x, y): (" << event.mouseWheelScroll.x << ", "
+                     << ", " << event.mouseWheelScroll.y << ")" << endl;
+            }
             else if (event.type == sf::Event::KeyPressed)
             {
                 if (event.key.code == sf::Keyboard::Escape || event.key.code == sf::Keyboard::X)
+                {
                     window.create(sf::VideoMode(1024, 640, desktop.bitsPerPixel), "SFML Window");
+                }
+                else if(event.key.code == sf::Keyboard::Space)
+                {
+                    window.setKeyRepeatEnabled(keyRepeat = !keyRepeat);
+                    cout << "keyRepeat: " << keyRepeat << endl;
+                }
+                else if(event.key.code == sf::Keyboard::Up)
+                {
+                    threshold += 0.1f;
+                    window.setJoystickThreshold(threshold);
+                    cout << "threshold: " << threshold << endl;
+                }
+                else if(event.key.code == sf::Keyboard::Down)
+                {
+                    threshold += -0.1f;
+                    window.setJoystickThreshold(threshold);
+                    cout << "threshold: " << threshold << endl;
+                }
             }
         }
 
@@ -82,13 +158,13 @@ int main()
         text.setPosition(sf::Vector2f(2048/2+300, 1024/2-12));
         text.setScale(sf::Vector2f(angle, angle));
         text.setRotation(angle * 10);
-        text.setString(L"汉语");
+        // text.setString(L"汉语");
         window.draw(text);
         text.setOrigin(sf::Vector2f(24, 18));
         text.setPosition(sf::Vector2f(2048/2-150, 1024/2-12));
         text.setScale(sf::Vector2f(angle, angle));
         text.setRotation(angle * 10);
-        text.setString(L"יטאח");
+        // text.setString(L"יטאח");
         window.draw(text);
 
         window.display();

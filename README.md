@@ -33,9 +33,9 @@ SFML - Simple and Fast Multimedia 是一个轻量的跨平台图形编程框架�
     - ✔[Inheritances 继承](./SFML-tuorials-cpp.md#-Inheritances-继承)
     - ✔[Friend & Access Control](./SFML-tuorials-cpp.md#-Friend--Access-Control)
     - ✔[Override vs. Overwrite](./SFML-tuorials-cpp.md#-Override-vs-Overwrite)
-    - ✔[Scope & Name-Hiding](./SFML-tuorials-cpp.md#-Scope-&-Name-Hiding)
+    - ✔[Scope & Name-Hiding](./SFML-tuorials-cpp.md#-Scope--Name-Hiding)
     - ✔[CRTP Static Polymorphism 静多态](./SFML-tuorials-cpp.md#-CRTP-Static-Polymorphism-静多态)
-    - ✔[Virtual & Polymorphism 虚拟与多态机制](./SFML-tuorials-cpp.md#-Virtual-&-Polymorphism-虚拟与多态机制)
+    - ✔[Virtual & Polymorphism 虚拟与多态机制](./SFML-tuorials-cpp.md#-Virtual--Polymorphism-虚拟与多态机制)
     - ✔[Virtual and Multiple Inheritance](./SFML-tuorials-cpp.md#-Virtual-and-Multiple-Inheritance)
     - ✔[Class Layout 类数据结构布局](./SFML-tuorials-cpp.md#-Class-Layout-类数据结构布局)
 

@@ -41,6 +41,27 @@
 			]
 		},
 		{
+			"name": "❤GLSL Compiler",
+			"working_dir": "${project_path}/build",
+			"encoding": "gbk",
+			"quiet": true,
+			"cmd": ["echo", "shell_cmd cause this command disabled!"],
+			"shell_cmd": "where glslangValidator && glslangValidator --version",
+			"env":
+			{
+				"PATH": "c:/vcpkg/;%PATH%",
+			},
+			// for GLSL Compiler message process
+			"file_regex": "^(?:ERROR|WARNING): [0-9]+:([0-9]+): (.*)$",
+			"variants":
+			[
+				{
+					"name": "GLSL Validator",
+					"shell_cmd": "glslangValidator --version && where glslangValidator && glslangValidator ${file} && echo Done!"
+				},
+			]
+		},
+		{
 			"name": "❤GCC Compiler",
 			"working_dir": "${project_path}/build",
 			"encoding": "gbk",
@@ -61,11 +82,11 @@
 				},
 				{
 					"name": "Compile & Run (GCC Debug)",
-					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} -lstdc++ -Og -g -o ${file_base_name} && ${file_base_name}"
+					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} -lstdc++ -Og -g -o ${file_base_name} && ${file_base_name} && echo Done!"
 				},
 				{
 					"name": "Compile & Run (GCC Release)",
-					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} -lstdc++ -Os -s -o ${file_base_name} && ${file_base_name}"
+					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} -lstdc++ -Os -s -o ${file_base_name} && ${file_base_name} && echo Done!"
 				},
 			]
 		},
@@ -87,11 +108,11 @@
 			[
 				{
 					"name": "Memory Layout of Class (MSVC)",
-					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} /d1reportSingleClassLayout${file_base_name} && ${file_base_name}"
+					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} /d1reportSingleClassLayout${file_base_name} && ${file_base_name} && echo Done!"
 				},
 				{
 					"name": "Compile & Run (MSVC)",
-					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} && ${file_base_name}"
+					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} && ${file_base_name} && echo Done!"
 				},
 			]
 		},
@@ -115,7 +136,7 @@
 			[
 				{
 					"name": "Ninja - all",
-					"shell_cmd": "%VCVARS64% x64 && ninja.exe -f build.ninja all && echo Done!"
+					"shell_cmd": "%VCVARS64% x64 && ninja.exe -f build.ninja all && sfml_${file_base_name} & echo Done!"
 				},
 				{
 					"name": "CMake install",

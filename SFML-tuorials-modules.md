@@ -95,3 +95,31 @@ Windows 平台下的依赖关系，文件名中的 -s 后缀表示静态链接�
     - ws2_32.lib
 
 
+注意，在 Windows 系统创建项目时，程序的入口可能被设置为专用的 WinMain，而不是标准的 C/C++ 主函数 main，这样就不能在 Linux 或 macOS 中使用。SFML 提供了一个 main 模块来做入口适配工作，这大概是最简单的一个模块了，文档上也没过多说明。使用它，只需要引用 sfml-main-d.lib 或 sfml-main.lib，分别对应 Debug 和 Release 两种配置。
+
+使用 Code::Blocks (MinGW) 做开发时，文档建议不要使用其内置的 SFML 工程模板，因为更新不及时，可能不兼容最新的 SFML。
+
+因为链接方式使用了 */SUBSYSTEM:CONSOLE*，很多程序运行时会自带一个控制台，即使是有图形界面。因为 Windows 控制台程序和图形界面不冲突，可以在同一个程序同时使用。
+
+而完全使用图形界面，隐藏控制台，即不使用控制台子系统，就意味着程序需要提供 *WinMain* 作为入口。但是，程序为了保证兼容，还是会保留 *main*，并且通过 *WinMain* 来调用标准的 C/C++ 程序入口。
+
+```cpp
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)
+{
+    return main(__argc, __argv);
+}
+```
+
+在 CMake 中可以通过以下方式设置链接选项来确定子系统：
+
+```sh
+set(CMAKE_EXE_LINKER_FLAGS "/subsystem:windows")
+add_link_options("/subsystem:windows")
+target_link_options(some_exe PUBLIC "/subsystem:windows")
+```
+
+这三种方式的差别在于：
+
+- 通过 *set* 命令设置的链接标志可能会被其它命令设置的标记覆盖；
+- 通过 *add_link_option* 命令设置的链接参数会被所有目标使用；
+- 通过 *target_link_options* 设置的链接参数只对指定的目标有效。

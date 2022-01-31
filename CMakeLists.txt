@@ -33,13 +33,21 @@ message("CMAKE_MODULE_PATH: " ${CMAKE_MODULE_PATH})
 
 set(SFML_STATIC_LIBRARIES TRUE)
 set(STATIC_LIBRARIES TRUE)
-find_package(SFML COMPONENTS system window graphics audio network)
+find_package(SFML COMPONENTS system window graphics audio network main)
 include_directories(${SFML_INCLUDE_DIR})
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_BUILD_TYPE Release)
+
+# gcc -Wl,--subsystem,windows
+# set(CMAKE_EXE_LINKER_FLAGS "/subsystem:windows")
+# add_link_options("/subsystem:windows")
+# target_link_options(some_exe PUBLIC "/subsystem:windows")
+
 # set(CMAKE_CXX_FLAGS "/MT")
 # set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+# add_definitions("/MT")
+add_compile_options(/MT)
 
 string(TOLOWER ${CMAKE_BUILD_TYPE} BUILDTYPE)
 if("${BUILDTYPE}" STREQUAL "release")
@@ -73,6 +81,9 @@ add_sfml_executable(sfml_particles examples/particles.cpp)
 add_sfml_executable(sfml_shaders examples/shaders.cpp)
 add_executable(cpp_friends examples/friends.cpp)
 add_executable(cpp_ostrich examples/ostrich.cpp)
+
+# No /subsystem:console, no console.
+# target_link_options(sfml_shaders PUBLIC "/subsystem:windows")
 
 
 if(MSVC)

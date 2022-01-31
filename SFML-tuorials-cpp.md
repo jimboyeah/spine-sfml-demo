@@ -199,9 +199,9 @@ Table 14.1 Varieties of Inheritance 展示了各种基本继承关系中父类�
 
 |  Base's Property   | Public Inheritance | Protected Inheritance | Private Inheritance |
 |--------------------|--------------------|-----------------------|---------------------|
-| Public memobers    | Public members     | Protected members     | Private members     |
-| Protected memobers | Protected members  | Protected members     | Private members     |
-| Private memobers   | NO                 | NO                    | NO                  |
+| Public members     | Public members     | Protected members     | Private members     |
+| Protected members  | Protected members  | Protected members     | Private members     |
+| Private members    | NO                 | NO                    | NO                  |
 | Implicit upcasting | Yes                | Yes (within)          | No                  |
 
 注意，public 继承方式是完全支持隐式转型的，即编译器会直接将子类实例变量或指针赋值给父类实例变量或指针。
@@ -917,9 +917,9 @@ Table 14.1 Varieties of Inheritance 展示了各种基本继承关系中父类�
 
 |  Base's Property   | Public Inheritance | Protected Inheritance | Private Inheritance |
 |--------------------|--------------------|-----------------------|---------------------|
-| Public memobers    | Public members     | Protected members     | Private members     |
-| Protected memobers | Protected members  | Protected members     | Private members     |
-| Private memobers   | NO                 | NO                    | NO                  |
+| Public members     | Public members     | Protected members     | Private members     |
+| Protected members  | Protected members  | Protected members     | Private members     |
+| Private members    | NO                 | NO                    | NO                  |
 | Implicit upcasting | Yes                | Yes (within)          | No                  |
 
 注意，public 继承方式是完全支持隐式转型的，所以上面的代码中可以直接将 SingingWaiter 的指针赋值给 Waiter 或 Singer 指针。

@@ -1,8 +1,10 @@
 #include <SFML/System.hpp>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+#include <SFML/Main.hpp>
 #include <iostream>
 #include <string>
+#include "AssetManager.hpp"
 
 using namespace std;
 
@@ -24,59 +26,87 @@ string codeVS =
 // Fragment shader
 string codeFS = 
 "   #version 120                                                 \n"\
-"   uniform sampler2D texture;                                   \n"\
+"   uniform sampler2D uTexture;                                  \n"\
 "                                                                \n"\
 "   void main()                                                  \n"\
 "   {                                                            \n"\
 "       // lookup the pixel in the texture                       \n"\
-"       vec4 pixel = texture2D(texture, gl_TexCoord[0].xy);      \n"\
+"       vec4 pixel = texture2D(uTexture, gl_TexCoord[0].xy);     \n"\
 "                                                                \n"\
 "       // multiply it by the color                              \n"\
 "       gl_FragColor = gl_Color * pixel;                         \n"\
 "   }                                                            \n";
 
-int main()
+int main() try
 {
     sf::RenderWindow window(sf::VideoMode(2000, 1080), "SFML works!");
 
+    char *texturePath = "cpp\\data\\owl-pma.png";
+    char *texturePath2 = "cpp\\data\\mix-and-match-pma.png";
+
     sf::Texture texture;
-    if(!texture.loadFromFile("cpp\\data\\owl-pma.png")){
-        // error;
+    if(!texture.loadFromFile(texturePath)){
+        cout << __FILE__ << "(" << __LINE__ << "): error C0000: Texture::loadFromFile: " 
+             << texturePath << endl;
     }
 
+    sf::Texture texture2 = AssetManager::GetTexture(texturePath2);
     // create a quad
     sf::VertexArray quad(sf::Quads, 4);
 
-    // define a primitive shape, located at (10, 10) and with size 250x210
-    quad[0].position = sf::Vector2f( 10.f,  10.f);
-    quad[1].position = sf::Vector2f(260.f,  10.f);
-    quad[2].position = sf::Vector2f(260.f, 220.f);
-    quad[3].position = sf::Vector2f( 10.f, 220.f);
+    // define a primitive shape, located at (-280, -260) and with size 560x520
+    quad[0].position = sf::Vector2f(-280.f,-260.f);
+    quad[1].position = sf::Vector2f( 280.f,-260.f);
+    quad[2].position = sf::Vector2f( 280.f, 260.f);
+    quad[3].position = sf::Vector2f(-280.f, 260.f);
 
-    // define its texture area to be a 250x210 rectangle starting at (0, 0)
+    // define its texture area to be a 250x210 pixels rectangle starting at (0, 0)
     quad[0].texCoords = sf::Vector2f(   0.f,   0.f);
     quad[1].texCoords = sf::Vector2f( 250.f,   0.f);
     quad[2].texCoords = sf::Vector2f( 250.f, 210.f);
     quad[3].texCoords = sf::Vector2f(   0.f, 210.f);
 
-    sf::RenderStates states;
-    states.transform.translate(2000/2-250/2, 1080/2-210/2);
+    sf::RenderStates statesLeft;
+    sf::RenderStates statesRight;
+    statesLeft.transform.translate(2000/2-500, 1080/2);
+    statesRight.transform.translate(2000/2+500, 1080/2);
 
-    sf::Transform transform;
-    transform.rotate(0.05f, 250/2, 210/2);
-    // states.texture = &texture;
+    sf::Transform toRotate;
+    toRotate.rotate(0.05f, 0, 0);
+    statesLeft.texture = &texture;
 
     if (!sf::Shader::isAvailable()){
         // error
     }
 
     sf::Shader shader;
-    shader.loadFromMemory(codeVS, sf::Shader::Type::Vertex);
-    shader.loadFromMemory(codeFS, sf::Shader::Type::Fragment);
-    // shader.loadFromMemory(codeVS, codeFS);
+    statesLeft.shader = &shader;
 
-    shader.setUniform("texture", sf::Shader::CurrentTexture);
+    shader.loadFromMemory(codeVS, codeFS);
+    // shader.loadFromMemory(codeVS, sf::Shader::Type::Vertex);
+    // shader.loadFromMemory(codeFS, sf::Shader::Type::Fragment);
 
+    char *vertShader = "../examples/sfml_essentials_ch6.vert";
+    char *fragShader = "../examples/sfml_essentials_ch6.frag";
+    sf::Shader *shaderRight = new sf::Shader();
+    shaderRight->loadFromFile(vertShader, fragShader);
+    // shaderRight->setUniform("uTexture", texture);
+    // shaderRight->setUniform("uTexture", sf::Shader::CurrentTexture);
+    // sf::Shader::bind(&shaderRight);
+
+    // sf::Shader *shaderRight = AssetManager::GetShader(vertShader, fragShader);
+    sf::Sprite sprite(AssetManager::GetTexture(texturePath));
+    sprite.setColor(sf::Color(255, 128, 255, 192));
+    statesRight.shader = shaderRight;
+    statesRight.texture = sprite.getTexture();
+
+    shaderRight->setUniform("uTexture", *sprite.getTexture());
+    shaderRight->setUniform("uPositionFreq", 0.1f);
+    shaderRight->setUniform("uSpeed", 20.0f);
+    shaderRight->setUniform("uStrength", 0.03f);
+
+    sf::Clock clock;
+    bool enableRotate = true;
     while (window.isOpen())
     {
         sf::Event event;
@@ -84,16 +114,37 @@ int main()
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+            else if (event.type == sf::Event::KeyPressed)
+            {
+                if (event.key.code == sf::Keyboard::Space)
+                {
+                    enableRotate = !enableRotate;
+                }
+                else if (event.key.code == sf::Keyboard::Escape)
+                {
+                    window.close();
+                }
+            }
         }
 
         window.clear();
 
-        states.transform *= transform;
-        window.draw(quad, states);
+        shaderRight->setUniform("uTime", clock.getElapsedTime().asSeconds());
+
+        if (enableRotate)
+        {
+            statesLeft.transform *= toRotate;
+            statesRight.transform *= toRotate;
+        }
+        window.draw(quad, statesLeft);
+        window.draw(sprite, statesRight);
 
         window.display();
     }
-
     return 0;
 }
+catch (ErrorLoading what)
+{
+    cout << "what happen to?" << what << endl;
+} // C++ function-try-block
 
