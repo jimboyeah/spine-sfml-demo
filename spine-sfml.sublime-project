@@ -9,36 +9,36 @@
 			"shell_cmd": "cmake -H. -S../dependencies/SFML-2.4.1-vc14-64-bit/../../ -G \"MinGW Makefiles\"",
 			"env":
 			{
-				"PATH": "c:/MinGW/bin/;%PATH%"
+				"PATH": "c:/MinGW/bin/;%PATH%",
 			},
 			"file_regex": "^(.+)\\((\\d+)\\)(): ((?:fatal )?(?:error|warning|note) \\w+\\d\\d\\d\\d): (.*)$",
 			"variants":
 			[
 				{
 					"shell_cmd": "make --version && g++ --version && make help",
-					"name": "Make help"
+					"name": "Make help",
 				},
 				{
 					"name": "clean",
-					"shell_cmd": "make clean"
+					"shell_cmd": "make clean",
 				},
 				{
 					"name": "clear all",
-					"shell_cmd": "del * /s /q"
+					"shell_cmd": "del * /s /q",
 				},
 				{
 					"name": "Make",
-					"shell_cmd": "make -j 10 all"
+					"shell_cmd": "make -j 10 all",
 				},
 				{
 					"name": "Make install",
-					"shell_cmd": "make install"
+					"shell_cmd": "make install",
 				},
 				{
 					"name": "Make test",
-					"shell_cmd": "make -j 10 && make test"
+					"shell_cmd": "make -j 10 && make test",
 				}
-			]
+			],
 		},
 		{
 			"name": "❤GLSL Compiler",
@@ -57,9 +57,9 @@
 			[
 				{
 					"name": "GLSL Validator",
-					"shell_cmd": "glslangValidator --version && where glslangValidator && glslangValidator ${file} && echo Done!"
+					"shell_cmd": "glslangValidator --version && where glslangValidator && glslangValidator ${file} && echo Done!",
 				},
-			]
+			],
 		},
 		{
 			"name": "❤GCC Compiler",
@@ -70,7 +70,10 @@
 			"shell_cmd": "where gcc && gcc --version",
 			"env":
 			{
-				"PATH": "c:/MinGW/bin/;%PATH%",
+				"PATH": "C:/Program Files (x86)/freeglut/bin;c:/MinGW/bin/;%PATH%",
+				"CPATH": "C:/Program Files (x86)/freeglut/include",
+				"LIBRARY_PATH": "C:/Program Files (x86)/freeglut/lib",
+				"LIBS": "-lopengl32 -lwinmm -lgdi32 -lm -lfreeglut -lfreeglut_static -lstdc++ -Wl,--subsystem,console",
 			},
 			// for GCC Compiler message process
 			"file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (?:error|fatal):(.*)$",
@@ -78,17 +81,29 @@
 			[
 				{
 					"name": "Memory Layout of Class (GCC)",
-					"shell_cmd": "gcc --version && gcc --std=c++11 -fdump-class-hierarchy ${file} -lstdc++ && echo Done with ${file_base_name}.class!"
+					"shell_cmd": "gcc --version && gcc --std=c++11 -fdump-class-hierarchy ${file} %LIBS% && echo Done with ${file_base_name}.class!",
 				},
 				{
 					"name": "Compile & Run (GCC Debug)",
-					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} -lstdc++ -Og -g -o ${file_base_name} && ${file_base_name} && echo Done!"
+					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} %LIBS% -Og -g -o ${file_base_name} && ${file_base_name} && echo Done!",
 				},
 				{
 					"name": "Compile & Run (GCC Release)",
-					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} -lstdc++ -Os -s -o ${file_base_name} && ${file_base_name} && echo Done!"
+					"shell_cmd": "gcc --version && where gcc && gcc --std=c++11 ${file} %LIBS% -Os -s -o ${file_base_name} && ${file_base_name} && echo Done!",
 				},
-			]
+				{
+					"name": "GNU Make Win32",
+					"shell_cmd": "cd \"${file_path}\" & powershell -Command \"make --version; where make; make Win32; \" && ${file_base_name} & echo Done!",
+				},
+				{
+					"name": "GNU Make all",
+					"shell_cmd": "cd \"${file_path}\" & powershell -Command \"make --version; where make; make all; \" && ${file_base_name} & echo Done!",
+				},
+				{
+					"name": "GNU Make Clean",
+					"shell_cmd": "cd \"${file_path}\" & powershell -Command \"make --version; where mak; make clean; echo Done!\"",
+				},
+			],
 		},
 		{
 			"name": "🌷MSVC Compiler",
@@ -108,13 +123,13 @@
 			[
 				{
 					"name": "Memory Layout of Class (MSVC)",
-					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} /d1reportSingleClassLayout${file_base_name} && ${file_base_name} && echo Done!"
+					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} /d1reportSingleClassLayout${file_base_name} && ${file_base_name} && echo Done!",
 				},
 				{
 					"name": "Compile & Run (MSVC)",
-					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} && ${file_base_name} && echo Done!"
+					"shell_cmd": "%VCVARS64% x64 && cl.exe ${file} && ${file_base_name} && echo Done!",
 				},
-			]
+			],
 		},
 		{
 			"name": "💛CMake Generate -> Ninja (Windows)",
@@ -136,37 +151,58 @@
 			[
 				{
 					"name": "Ninja - all",
-					"shell_cmd": "%VCVARS64% x64 && ninja.exe -f build.ninja all && sfml_${file_base_name} & echo Done!"
+					"shell_cmd": "%VCVARS64% x64 && ninja.exe -f build.ninja all && sfml_${file_base_name} & echo Done!",
 				},
 				{
 					"name": "CMake install",
-					"shell_cmd": "cmake --install . --prefix distributed"
+					"shell_cmd": "cmake --install . --prefix distributed",
 				},
 				{
 					"name": "Ninja - clean",
-					"shell_cmd": "ninja.exe -f build.ninja clean"
+					"shell_cmd": "ninja.exe -f build.ninja clean",
 				},
 				{
 					"name": "Ninja - rebuild_cache",
-					"shell_cmd": "ninja.exe -f build.ninja rebuild_cache"
+					"shell_cmd": "ninja.exe -f build.ninja rebuild_cache",
 				},
 				{
 					"name": "Ninja - test",
-					"shell_cmd": "ninja.exe -f build.ninja test"
+					"shell_cmd": "ninja.exe -f build.ninja test",
 				},
 				{
 					"name": "Ninja - edit_cache",
-					"shell_cmd": "ninja.exe -f build.ninja edit_cache"
+					"shell_cmd": "ninja.exe -f build.ninja edit_cache",
 				},
-			]
+			],
 		},
 	],
 	"folders":
 	[
 		{
-			"binary_file_patterns": [ "*.nothing" ],
+			"binary_file_patterns": [ "*.nothing"],
 			"name": "☾ SFML Demo Project",
-			"path": "."
-		}
-	]
+			"path": ".",
+		},
+		{
+			"path": "C:\\codeblocks\\MinGW\\x86_64-w64-mingw32\\include\\GL",
+		},
+		{
+			"path": "C:\\Program Files (x86)\\freeglut",
+		},
+		{
+			"path": "dependencies\\OpenGLInsightsCode\\Chapter 15 Depth of Field with Bokeh Rendering\\src\\external\\glm-0.9.2.4",
+		},
+		{
+			"path": "dependencies\\OpenGLInsightsCode\\Chapter 15 Depth of Field with Bokeh Rendering\\src\\external\\glew-1.7.0",
+		},
+		{
+			"path": "dependencies\\OpenGLInsightsCode\\Chapter 15 Depth of Field with Bokeh Rendering\\src\\external\\devil-1.7.8",
+		},
+		{
+			"path": "C:\\download\\OpenCV\\freeglut-3.2.1",
+		},
+		{
+			"path": "C:\\download\\OpenCV\\glad-master"
+		},
+	],
 }

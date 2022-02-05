@@ -61,28 +61,32 @@ SFML 在 macOS 系统上有两种二进制格式，dylib vs framework，推荐�
 SFML 是模块化的框架：
 
 - System 系统底层的处理模块，如时间、线程、用户数据流，包括手柄 API 的适配，工具类的实现；
-- Graphics 图形处理模块，如字体图形处理使用了 freetype，还有 OpenGL 图形接口；
-- Window 图形窗口适配，主要是用户界面的交互；
-- Audio 音频处理模块，支持多种格式的音频；
-- Network 网络通信模块，如联机游戏支持，FTP 应用等；
+- Graphics 模块基于 OpenGL 提供图形处理能力，还有如字体图形处理使用了 freetype；
+- Window 操作系统图形窗口适配，主要是用户界面的交互；
+- Audio 音频流处理模块，支持多种格式的音频，录音，空间化 spatialization；
+- Network 网络通信模块，如联机游戏支持，HTTP、FTP 等应用等；
+
+SFML 本身是基于 OpenGL 接口规范构建的，但其本身只是做了与操作的适配工作，以实现框架的跨平台的适用性。OpenGL 接口规范定义的 API 在 SFML 的源代码中 \SFML\Graphics\GLLoader.hpp，这相当一个 GLUT 或者 GLFW 这样的 API 导入工具。头文件定义了 OpenGL 的常量、标准 API 和扩展 API。
+
+SFML 完成编译后不会再使用这个头文件，所以在预计编译的下载包中并没有包含这个 OpenGL API 加载器。
 
 各个模块在不同的系统下有不同的依赖关系。
 
 Windows 平台下的依赖关系，文件名中的 -s 后缀表示静态链接库，-d 表示带调试符号，不带这些后缀的用于动态链接库：
 
-- System (sfml-system-s.lib)
+- System (sfml-system-s.lib `#include <SFML/System.hpp>`)
     - winmm.lib
-- Graphics (sfml-graphics-s.lib)
+- Graphics (sfml-graphics-s.lib `#include <SFML/Graphics.hpp>`)
     - sfml-window-s.lib
     - sfml-system-s.lib
     - opengl32.lib
     - freetype.lib
-- Window (sfml-window-s.lib)
+- Window (sfml-window-s.lib `#include <SFML/Window.hpp>`)
     - sfml-system-s.lib
     - opengl32.lib
     - winmm.lib
     - gdi32.lib
-- Audio (sfml-audio-s.lib)
+- Audio (sfml-audio-s.lib `#include <SFML/Audio.hpp>`)
     - sfml-system-s.lib
     - openal32.lib
     - flac.lib
@@ -90,10 +94,60 @@ Windows 平台下的依赖关系，文件名中的 -s 后缀表示静态链接�
     - vorbisfile.lib
     - vorbis.lib
     - ogg.lib
-- Network (sfml-network-s.lib)
+- Network (sfml-network-s.lib `#include <SFML/Network.hpp>`)
     - sfml-system-s.lib
     - ws2_32.lib
 
+官方文档提供了一个简短的例子来帮助大概了解 SFML 框架：
+
+```cpp
+#include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
+
+int main(){
+    // Create the main window
+    sf::RenderWindow window(sf::VideoMode(800, 600), "SFML window");
+    
+    // Load a sprite to display
+    sf::Texture texture;
+    if (!texture.loadFromFile("cute_image.jpg"))return EXIT_FAILURE;
+    sf::Sprite sprite(texture);
+
+    // Create a graphical text to displaysf::Font font;
+    if (!font.loadFromFile("arial.ttf"))
+        return EXIT_FAILURE;
+    sf::Text text("Hello SFML", font, 50);
+
+    // Load a music to playsf::Music music;
+    if (!music.openFromFile("nice_music.ogg")) 
+        return EXIT_FAILURE;
+
+    // Play the music
+    music.play();
+
+    // Start the game loop
+    while (window.isOpen()){
+        // Process events
+        sf::Event event;
+        while (window.pollEvent(event)){
+            // Close window: exit
+            if (event.type == sf::Event::Closed) window.close();
+        }
+        // Clear screen
+        window.clear();
+
+        // Draw the sprite
+        window.draw(sprite);
+
+        // Draw the string
+        window.draw(text);
+
+        // Update the window
+        window.display();
+    }
+    return EXIT_SUCCESS;
+}
+```
 
 注意，在 Windows 系统创建项目时，程序的入口可能被设置为专用的 WinMain，而不是标准的 C/C++ 主函数 main，这样就不能在 Linux 或 macOS 中使用。SFML 提供了一个 main 模块来做入口适配工作，这大概是最简单的一个模块了，文档上也没过多说明。使用它，只需要引用 sfml-main-d.lib 或 sfml-main.lib，分别对应 Debug 和 Release 两种配置。
 
@@ -101,7 +155,7 @@ Windows 平台下的依赖关系，文件名中的 -s 后缀表示静态链接�
 
 因为链接方式使用了 */SUBSYSTEM:CONSOLE*，很多程序运行时会自带一个控制台，即使是有图形界面。因为 Windows 控制台程序和图形界面不冲突，可以在同一个程序同时使用。
 
-而完全使用图形界面，隐藏控制台，即不使用控制台子系统，就意味着程序需要提供 *WinMain* 作为入口。但是，程序为了保证兼容，还是会保留 *main*，并且通过 *WinMain* 来调用标准的 C/C++ 程序入口。
+而完全使用图形界面，隐藏控制台，即不使用控制台子系统，就意味着程序需要提供 *WinMain* 作为入口。并且失去 C/C++ 程序通过标准输入输出功能，无法使用控制台打印消息，也无法获取控制台输入。但是，程序为了保证兼容，还是会保留 *main*，并且通过 *WinMain* 来调用标准的 C/C++ 程序入口。
 
 ```cpp
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, INT)

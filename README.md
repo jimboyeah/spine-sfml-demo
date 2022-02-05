@@ -25,6 +25,15 @@ SFML - Simple and Fast Multimedia 是一个轻量的跨平台图形编程框架�
 - ✔[CMakeLists.txt Demo](./SFML-tutorials-cmake.md#-cmakeliststxt-demo)
 - ✔[Sublime Project](./SFML-tutorials-cmake.md#-sublime-project)
 
+## SFML Framework 入门教程
+
+- ✔[Module Dependencies](./SFML-tuorials-modules.md)
+- ✔[System Module](./SFML-tuorials-system.md)
+- ⚡[Window Module](./#-to-be-continue)
+- ⚡[Graphics Module](./#-to-be-continue)
+- ⚡[Audio Module](./#-to-be-continue)
+- ⚡[Network Module](./#-to-be-continue)
+
 ## C++ 知识补充
 
 - ✔[C++: Big forest 书单](/SFML-tuorials-Big-forest.md)
@@ -54,11 +63,3 @@ SFML - Simple and Fast Multimedia 是一个轻量的跨平台图形编程框架�
     - ✔[auto_ptr to unique_ptr 独占智能指针](./SFML-tuorials-smart-pointer.md#-auto_ptr-to-unique_ptr)
     - ✔[shared_ptr & weak_ptr 共享智能指针](./SFML-tuorials-smart-pointer.md#-shared_ptr--weak_ptr-共享智能指针)
 
-## SFML Framework 入门教程
-
-- ✔[Module Dependencies](./SFML-tuorials-modules.md)
-- ✔[System Module](./SFML-tuorials-system.md)
-- ⚡[Window Module](./#-to-be-continue)
-- ⚡[Graphics Module](./#-to-be-continue)
-- ⚡[Audio Module](./#-to-be-continue)
-- ⚡[Network Module](./#-to-be-continue)

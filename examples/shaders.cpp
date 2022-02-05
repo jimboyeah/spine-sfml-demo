@@ -41,7 +41,7 @@ int main() try
 {
     sf::RenderWindow window(sf::VideoMode(2000, 1080), "SFML works!");
 
-    char *texturePath = "cpp\\data\\owl-pma.png";
+    char *texturePath = "cpp\\data\\owel-pma.png";
     char *texturePath2 = "cpp\\data\\mix-and-match-pma.png";
 
     sf::Texture texture;
@@ -91,7 +91,7 @@ int main() try
     sf::Shader *shaderRight = new sf::Shader();
     shaderRight->loadFromFile(vertShader, fragShader);
     // shaderRight->setUniform("uTexture", texture);
-    // shaderRight->setUniform("uTexture", sf::Shader::CurrentTexture);
+    shaderRight->setUniform("uTexture", sf::Shader::CurrentTexture);
     // sf::Shader::bind(&shaderRight);
 
     // sf::Shader *shaderRight = AssetManager::GetShader(vertShader, fragShader);

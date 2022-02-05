@@ -15,6 +15,7 @@
 #include <memory>
 #include <iostream>
 
+using namespace std;
 
 ///////////////////////////////////////////////
 ///< Declarations                          >///
@@ -105,7 +106,8 @@ sf::Texture& AssetManager::GetTexture(std::string const& filename)
         {
             throw ErrorLoading("Textue::LoadFromFile", filename);
         }
-        //texture.setSmooth(true);
+        cout << "Textue: " << &texture << " " << filename << endl;
+        texture.setSmooth(true);
         return texture;
     }
 }

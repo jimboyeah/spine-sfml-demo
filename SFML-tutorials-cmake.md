@@ -11,8 +11,11 @@ SDL 和 SFML 作为轻量级图形框架，常用用于 GUI 程序及游戏开�
 
 Spine 运行时提供了示范 Spine-SFML 示范工程，可以克隆下载：
 
->git clone git@github.com:EsotericSoftware/spine-runtimes
->git clone -b 4.0 --single-branch git@github.com:EsotericSoftware/spine-runtimes
+```sh
+> git clone git@github.com:EsotericSoftware/spine-runtimes
+> git clone -b 4.0 --single-branch git@github.com:EsotericSoftware/spine-runtimes
+```
+
 
 SFML 官方提供预编译文件下载，其中就包含 SFML-2.4.1\cmake\Modules\FindSFML.cmake，可以使用 CMake 脚本加载它来使用 SFML 框架。
 
@@ -47,53 +50,56 @@ SFML 作为跨平台的图形框架，可以在不同的平台工具中开发，
 
 为依赖 SFML 的客户工程编写编译脚本 CMakeLists.txt，根据安装位置在脚本中设置 FindSFML.cmake 查找脚本的位置，因为是非标准安装路径所以使用了 SFML_ROOT 变量：
 
-    # CMakeLists.txt example:
-    cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+```sh
+# CMakeLists.txt example:
+cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
-    option(UseMSVC "Using MSVC Compiler" ON)
-    if(UseMSVC)
-        set(CMAKE_C_COMPILER cl.exe)
-        set(CMAKE_CXX_COMPILER cl.exe)
-        set(CMAKE_RC_COMPILER rc.exe)
-        set(SFML_VER "SFML-2.4.1-vc14-64-bit")
-    endif()
+option(UseMSVC "Using MSVC Compiler" ON)
+if(UseMSVC)
+    set(CMAKE_C_COMPILER cl.exe)
+    set(CMAKE_CXX_COMPILER cl.exe)
+    set(CMAKE_RC_COMPILER rc.exe)
+    set(SFML_VER "SFML-2.4.1-vc14-64-bit")
+endif()
 
-    project(SFML_Win32)
+project(SFML_Win32)
 
-    option(MINGW "Using MinGW Library file name rule" OFF)
-    IF(MINGW)
-        SET(CMAKE_FIND_LIBRARY_PREFIXES "lib" "")
-        SET(CMAKE_FIND_LIBRARY_SUFFIXES ".dll" ".dll.a" ".a" ".lib")
-        add_definitions(-D_WIN32)
-        set(SFML_VER "SFML-2.4.1-mingw-gcc6.1-32-bit")
-    ENDIF(MINGW)
+option(MINGW "Using MinGW Library file name rule" OFF)
+IF(MINGW)
+    SET(CMAKE_FIND_LIBRARY_PREFIXES "lib" "")
+    SET(CMAKE_FIND_LIBRARY_SUFFIXES ".dll" ".dll.a" ".a" ".lib")
+    add_definitions(-D_WIN32)
+    set(SFML_VER "SFML-2.4.1-mingw-gcc6.1-32-bit")
+ENDIF(MINGW)
 
-    find_path(SFML_FRAMEWORK "${SFML_VER}" "../../dependencies/")
-    if(SFML_FRAMEWORK)
-        set(SFML_ROOT "${SFML_FRAMEWORK}/${SFML_VER}")
-        message("SFML Framework Found: " ${SFML_ROOT})
-    else()
-        message("SFML Framework Not found: " ${SFML_VER})    
-    endif()
+find_path(SFML_FRAMEWORK "${SFML_VER}" "../../dependencies/")
+if(SFML_FRAMEWORK)
+    set(SFML_ROOT "${SFML_FRAMEWORK}/${SFML_VER}")
+    message("SFML Framework Found: " ${SFML_ROOT})
+else()
+    message("SFML Framework Not found: " ${SFML_VER})    
+endif()
 
-    # set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SFML_ROOT}/cmake/Modules/")
-    list(APPEND CMAKE_MODULE_PATH "${SFML_ROOT}/cmake/Modules/")
-    list(APPEND CMAKE_PREFIX_PATH "${SFML_ROOT}/cmake/Modules/")
+# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${SFML_ROOT}/cmake/Modules/")
+list(APPEND CMAKE_MODULE_PATH "${SFML_ROOT}/cmake/Modules/")
+list(APPEND CMAKE_PREFIX_PATH "${SFML_ROOT}/cmake/Modules/")
 
-    set(SFML_STATIC_LIBRARIES TRUE)
-    find_package(SFML COMPONENTS system window graphics audio network)
-    include_directories(${SFML_INCLUDE_DIR})
+set(SFML_STATIC_LIBRARIES TRUE)
+find_package(SFML COMPONENTS system window graphics audio network)
+include_directories(${SFML_INCLUDE_DIR})
 
-    add_executable(sfml_window examples/window.cpp)
-    target_link_libraries(sfml_window ${SFML_LIBRARIES} opengl32 winmm )
-    target_link_libraries(sfml_window ${SFML_DEPENDENCIES} )
+add_executable(sfml_window examples/window.cpp)
+target_link_libraries(sfml_window ${SFML_LIBRARIES} opengl32 winmm )
+target_link_libraries(sfml_window ${SFML_DEPENDENCIES} )
 
-    foreach(item ${SFML_LIBRARIES})
-        message("SFML_LIBRARIES:" ${item})
-    endforeach()
-    foreach(item ${SFML_DEPENDENCIES})
-        message("SFML_DEPENDENCIES:" ${item})
-    endforeach()
+foreach(item ${SFML_LIBRARIES})
+    message("SFML_LIBRARIES:" ${item})
+endforeach()
+foreach(item ${SFML_DEPENDENCIES})
+    message("SFML_DEPENDENCIES:" ${item})
+endforeach()
+```
+
 
 编写好 CMake 脚本后，就可以测试编译脚本的生成，以及执行编译工作：
 
@@ -118,28 +124,31 @@ $ cat README.md
 
 CMake 会通过编译一段测试程序对编译器进行 ABI 信息测试，期间可能会收到以下错误信息。所谓 ABI，是指应用程序二进制接口（Application Binary Interface, ABI）。
 
-    >cmake -H. -S. -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -G "Sublime Text 2 - Ninja"
-    -- The C compiler identification is GNU 10.2.0
-    -- The CXX compiler identification is MSVC 19.26.28806.0
-    -- Detecting C compiler ABI info
-    -- Detecting C compiler ABI info - done
-    -- Check for working C compiler: C:/mingw/bin/cc.exe - skipped
-    -- Detecting C compile features
-    -- Detecting C compile features - done
-    -- Detecting CXX compiler ABI info
-    -- Detecting CXX compiler ABI info - failed
-    -- Check for working CXX compiler: C:/MSVC2019/Community/VC/Tools/MSVC/14.26.28801/bin/Hostx64/x64/cl.exe
-    -- Check for working CXX compiler: C:/MSVC2019/Community/VC/Tools/MSVC/14.26.28801/bin/Hostx64/x64/cl.exe - broken
-    CMake Error at C:/CMake/share/cmake-3.18/Modules/CMakeTestCXXCompiler.cmake:59 (message):
-      The C++ compiler
+```sh
+>cmake -H. -S. -Bbuild -DCMAKE_VERBOSE_MAKEFILE=ON -G "Sublime Text 2 - Ninja"
+-- The C compiler identification is GNU 10.2.0
+-- The CXX compiler identification is MSVC 19.26.28806.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: C:/mingw/bin/cc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - failed
+-- Check for working CXX compiler: C:/MSVC2019/Community/VC/Tools/MSVC/14.26.28801/bin/Hostx64/x64/cl.exe
+-- Check for working CXX compiler: C:/MSVC2019/Community/VC/Tools/MSVC/14.26.28801/bin/Hostx64/x64/cl.exe - broken
+CMake Error at C:/CMake/share/cmake-3.18/Modules/CMakeTestCXXCompiler.cmake:59 (message):
+  The C++ compiler
 
-        "C:/MSVC2019/Community/VC/Tools/MSVC/14.26.28801/bin/Hostx64/x64/cl.exe"
+    "C:/MSVC2019/Community/VC/Tools/MSVC/14.26.28801/bin/Hostx64/x64/cl.exe"
 
-      is not able to compile a simple test program.
+  is not able to compile a simple test program.
 
-      It fails with the following output:
-      ...
-        LINK : fatal error LNK1104: 无法打开文件“kernel32.lib”
+  It fails with the following output:
+  ...
+    LINK : fatal error LNK1104: 无法打开文件“kernel32.lib”
+    ```
+    
 
 执行脚本前，先执行 MSVC 环境配置批处理脚本，根据需要设置平台类型，如 x86 或 x64，然后再执行 CMake -G 生成构建脚本：
 
