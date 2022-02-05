@@ -34,6 +34,15 @@ SFML - Simple and Fast Multimedia 是一个轻量的跨平台图形编程框架�
 - ⚡[Audio Module](./#-to-be-continue)
 - ⚡[Network Module](./#-to-be-continue)
 
+## OpenGL Shading Language
+
+- ✔ [The Graphics Rendering Pipeline](./SFML-tuorials-glsl.md#-The-Graphics-Rendering-Pipeline)
+- ✔ [OpenGL History & Core Profile](./SFML-tuorials-glsl.md#-OpenGL-History--Core-Profile)
+- ✔ [OpenGL API Loaders](./SFML-tuorials-glsl.md#-OpenGL-API-Loaders)
+- ✔ [GLUT & FreeGLUT](./SFML-tuorials-glsl.md#-GLUT--FreeGLUT)
+- ✔ [Shaders Language](./SFML-tuorials-glsl.md#-Shaders-Language)
+
+
 ## C++ 知识补充
 
 - ✔[C++: Big forest 书单](/SFML-tuorials-Big-forest.md)
