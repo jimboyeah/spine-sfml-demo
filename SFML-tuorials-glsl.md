@@ -274,6 +274,23 @@ OpenGL 历史版本更新：
 | 2014       | OpenGL 4.5   | 4.50 |                                                    |
 | 2017       | OpenGL 4.6   | 4.60 | The SPIR-V language can be used to define shaders. |
 
+关键的版本有：
+
+- OpenGL 2.0 引入着色器语言，支持顶点着色器、片段着色器；
+- OpenGL 3.2 引入几何着色器；
+- OpenGL 4.0 引入细分着色器；
+- OpenGL 4.3 引入计算着色器；
+- OpenGL 4.6 正式引入 SPIR-V 标准可移植中间层语言；
+
+OpenGL 4.5 最大变化就是支持 Khronos 自家开发新设计的 SPIR-V，Standard Portable Intermediate Representation，这是一种 GPU 通用计算和图形学的中间语言，最初是为 OpenCL 规范准备的，和下一代图形标准 Vulkan 差不多同时提出，也在不断发展完善。
+
+着色器就是渲染管线中的可编程阶段执行的 GUP 代码，也就是一个编译单元，互相独立的小段程序。顶点着色器各片段着色器是两个最基本的用户定义的着色器，各个着色器的输入输入是受约束的，片段着色器只能访问当前输入的片段，不可以访问邻近的其它片段。
+
+而相对自由的计算着色器是可以访问其它着色器处理器可使用的资源，包括纹理、缓冲、图像变量、原子计数器等，它没有固定的输出。它不是图形管道的一部分，其副作用是可以更改图像、存储缓冲区和原子计数器。
+
+计算着色器操作一个分组，即执行相同代码的一组着色器调用，可能是并行的。工作组内的调用之间可以通过共享变量共享数据，并发出内存和控制屏障，memory and control barriers，以实现同一工作组的其他成员同步。
+
+
 OpenGL 与 OpenGL ES/SC 的版本关联：
 
 - OpenGL 1.3 对应 OpenGL ES 1.0 和 OpenGL SC 1.0
@@ -552,9 +569,9 @@ void main()
 - 参数 out 没使用引用，这导致数据无法返回给函数外部；
 - 读取使用的 getline() 这会过滤掉换行符号，这会导致正常着色器代码会被注解掉。
 
-还好，在 main() 函数中使用了 function-try-block 进行处理，否则，发现不了问题所在，何调试程序就无从下手。
+还好，在 main() 函数中使用了 function-try-block 进行处理，否则，发现不了问题所在，调试程序就无从下手。
 
-以下代码演示了如何在 FreeGLUT 加载 OpenGL 扩展 API，只展示了 glDebugMessageCallback()，其它 API 加载可以通过 KHnoros 官方文档提供的头文件。 
+以下代码演示了如何在 FreeGLUT 加载 OpenGL 扩展 API，只展示了 glDebugMessageCallback()，其它 API 加载可以参考 KHnoros 官方文档提供的头文件。 
 
 ```cpp
 #include <iostream>
@@ -1394,12 +1411,14 @@ opengl.cpp:(.text+0x559): undefined reference to `glLinkProgram'
 - EGL:    *eglGetProcAddress(procName)*
 - X11: *glXGetProcAddressARB( ( const GLubyte * )procName )*
 
+WGL 是 OpenGL 在 Windows 平台下的 API 前缀，*wglGetProcAddress()* 函数在系统提供的 wingdi.h 头文件中声明。
+
 EGL 是 OpenGL ES 和本地窗口系统(native platform window system)之间的一个中间接口层，它主要由系统制造商实现。EGL 提供如下机制：
 
 - 与设备的原生窗口系统通信
 - 查询绘图表面的可用类型和配置
 - 创建绘图表面
-- 在OpenGL ES 和其他图形渲染API之间同步渲染
+- 在 OpenGL ES 和其他图形渲染 API 之间同步渲染
 - 管理纹理贴图等渲染资源
 
 OpenGL ES 是针对 Embedded Systems 嵌入式设备：手机、PDA 和游戏主机等而设计一个 OpenGL 子集，各显卡制造商和系统制造商来实现这组 API。为了让 OpenGL ES 能够绘制在当前设备上，需要 EGL 作为 OpenGL ES 与设备的桥梁。
@@ -1564,7 +1583,309 @@ GLSL 有大量内置函数，常用的数学函数都，例如：
 | genFType  tan(genFType angle)       | The standard trigonometric tangent.                   |
 
 
-GLSL 和其 C/C++ 等编程语言一样有数据类型，如 *int*, *float*, *double*, *uint*, *bool*，也有数组、结构体，条件判断、循环控件等等，运算符也类似。GLSL 还有两个容器类型向量和矩阵 vectors and matrices。
+GLSL 内置函数大多数所有着色器中通用，部分专用，大概分成三类：
+
+- 暴露硬件功能的函数，着色器无法模拟这些函数，如纹理贴图访问。
+- 代表一个简单的操作，如 clamp、mix 等函数，用户编写起来非常简单，但它们非常常见，可能有直接的硬件支持。对于编译器来说，将表达式映射到复杂的汇编指令是一个非常困难的问题。
+- 图形硬件加速的操作，三角函数属于这一类。
+
+可以参考 GLM 数学函数库，这个库的实现参考 GLSL 规范，GLM is a header only library，只提供头文件的实现方式，不需要构建。
+
+    git clone git@github.com:g-truc/glm.git
+
+以下是 GLSLangSpec.3.30 规范文档目录罗列的 Built-in Functions 原型，基本都是泛型函数，genType 就是表示泛型，以下省略掉相应 template 声明部分：
+
+```cpp
+// 8.1 Angle and Trigonometry Functions
+namespace trigonometric{
+    genType radians(genType const & degrees);
+    genType degrees(genType const & radians);
+    genType sin(genType const & angle);
+    genType cos(genType const & angle);
+    genType tan(genType const & angle);
+    genType asin(genType const & x);
+    genType acos(genType const & x);
+    genType atan(genType const & y, genType const & x);
+    genType atan(genType const & y_over_x);
+    genType sinh(genType const & angle);
+    genType cosh(genType const & angle);
+    genType tanh(genType const & angle);
+    genType asinh(genType const & x);
+    genType acosh(genType const & x);
+    genType atanh(genType const & x);
+}
+// 8.2 Exponential Functions
+namespace exponential{
+    genType pow(genType const & x, genType const & y);
+    genType exp(genType const & x);
+    genType log(genType const & x);
+    genType exp2(genType const & x);
+    genType log2(genType const & x);
+    genType sqrt(genType const & x);
+    genType inversesqrt(genType const & x);
+}
+// 8.3 Common Functions
+namespace common{
+    genFIType abs(genFIType const & x);
+    genFIType sign(genFIType const & x);
+    genType floor(genType const & x);
+    genType trunc(genType const & x);
+    genType round(genType const & x);
+    genType roundEven(genType const & x);
+    genType ceil(genType const & x);
+    genType fract(genType const & x);
+    genType mod(genType const & x, genType const & y);
+    genType mod(genType const & x, typename genType::value_type const & y);
+    genType modf(genType const & x, genType & i);
+    genType min(genType const & x, genType const & y);
+    genType min(genType const & x, typename genType::value_type const & y);
+    genType max(genType const & x, genType const & y);
+    genType max(genType const & x, typename genType::value_type const & y);
+    genType clamp(genType const & x, genType const & minVal, genType const & maxVal);
+    genType clamp(genType const & x, typename genType::value_type const & minVal, 
+                                     typename genType::value_type const & maxVal);
+    genTypeT mix(genTypeT const & x, genTypeT const & y, genTypeU const & a);
+    genType step(genType const & edge, genType const & x);
+    genType step(typename genType::value_type const & edge, genType const & x);
+    genType smoothstep(genType const & edge0, genType const & edge1, genType const & x);
+    genType smoothstep(typename genType::value_type const & edge0, 
+                       typename genType::value_type const & edge1, genType const & x);
+    typename genType::bool_type isnan(genType const & x);
+    typename genType::bool_type isinf(genType const & x);
+    genIType floatBitsToInt(genType const & value);
+    genUType floatBitsToUint(genType const & value);
+    genType intBitsToFloat(genIType const & value); 
+    genType uintBitsToFloat(genUType const & value); 
+    genType fma(genType const & a, genType const & b, genType const & c);
+    genType frexp(genType const & x, genIType & exp);
+    genType ldexp(genType const & x, genIType const & exp);
+} 
+// 8.4 Geometric Functions
+namespace geometric{
+    typename genType::value_type length(genType const & x);
+    typename genType::value_type distance(genType const & p0, genType const & p1);
+    typename genType::value_type dot(genType const & x, genType const & y);
+    detail::tvec3<T> cross(detail::tvec3<T> const & x, detail::tvec3<T> const & y);
+    genType normalize(genType const & x);
+    genType faceforward(genType const & N, genType const & I, genType const & Nref);
+    genType reflect(genType const & I, genType const & N);
+    genType refract(genType const & I, genType const & N, typename genType::value_type const & eta);
+}
+// 8.5 Matrix Functions
+namespace matrix{
+    matType matrixCompMult(matType const & x, matType const & y);
+    matType outerProduct(vecType const & c, vecType const & r);
+    typename matType::transpose_type transpose(matType const & x);
+    typename detail::tmat2x2<T>::value_type determinant(detail::tmat2x2<T> const & m);
+    typename detail::tmat3x3<T>::value_type determinant(detail::tmat3x3<T> const & m);
+    typename detail::tmat4x4<T>::value_type determinant(detail::tmat4x4<T> const & m);
+    detail::tmat2x2<T> inverse(detail::tmat2x2<T> const & m);
+    detail::tmat3x3<T> inverse(detail::tmat3x3<T> const & m);
+    detail::tmat4x4<T> inverse(detail::tmat4x4<T> const & m);
+}
+// 8.6 Vector Relational Functions
+namespace vector_relational{
+    typename vecType<T>::bool_type lessThan( vecType<T> const & x, vecType<T> const & y )
+    typename vecType<T>::bool_type lessThanEqual( vecType<T> const & x, vecType<T> const & y )
+    typename vecType<T>::bool_type greaterThan( vecType<T> const & x, vecType<T> const & y )
+    typename vecType<T>::bool_type greaterThanEqual( vecType<T> const & x, vecType<T> const & y )
+    typename vecType<T>::bool_type equal( vecType<T> const & x, vecType<T> const & y )
+    typename vecType<T>::bool_type notEqual( vecType<T> const & x, vecType<T> const & y )
+    bool any(vecType<bool> const & v);
+    bool all(vecType<bool> const & v);
+    vecType<bool> not_(vecType<bool> const & v);
+}
+// 8.7 Texture Lookup Functions
+    // Texture Query Functions
+    int textureSize (gsampler1D sampler, int lod)
+    ivec2 textureSize (gsampler2D sampler, int lod)
+    ivec3 textureSize (gsampler3D sampler, int lod)
+    ivec2 textureSize (gsamplerCube sampler, int lod)
+    int textureSize (sampler1DShadow sampler, int lod)
+    ivec2 textureSize (sampler2DShadow sampler, int lod)
+    ivec2 textureSize (samplerCubeShadow sampler, int lod)
+    ivec3 textureSize (samplerCubeArray sampler, int lod)
+    ivec3 textureSize (samplerCubeArrayShadow sampler, int lod)
+    ivec2 textureSize (gsampler2DRect sampler)
+    ivec2 textureSize (sampler2DRectShadow sampler)
+    ivec2 textureSize (gsampler1DArray sampler, int lod)
+    ivec3 textureSize (gsampler2DArray sampler, int lod)
+    ivec2 textureSize (sampler1DArrayShadow sampler, int lod)
+    ivec3 textureSize (sampler2DArrayShadow sampler, int lod)
+    int textureSize (gsamplerBuffer sampler)
+    ivec2 textureSize (gsampler2DMS sampler)
+    ivec2 textureSize (gsampler2DMSArray sampler)
+    vec2 textureQueryLod(gsampler1D sampler, float P)
+    vec2 textureQueryLod(gsampler2D sampler, vec2 P)
+    vec2 textureQueryLod(gsampler3D sampler, vec3 P)
+    vec2 textureQueryLod(gsamplerCube sampler, vec3 P)
+    vec2 textureQueryLod(gsampler1DArray sampler, float P)
+    vec2 textureQueryLod(gsampler2DArray sampler, vec2 P)
+    vec2 textureQueryLod(gsamplerCubeArray sampler, vec3 P)
+    vec2 textureQueryLod(sampler1DShadow sampler, float P)
+    vec2 textureQueryLod(sampler2DShadow sampler, vec2 P)
+    vec2 textureQueryLod(samplerCubeShadow sampler, vec3 P)
+    vec2 textureQueryLod(sampler1DArrayShadow sampler, float P)
+    vec2 textureQueryLod(sampler2DArrayShadow sampler, vec2 P)
+    vec2 textureQueryLod(samplerCubeArrayShadow sampler, vec3 P)
+    // Texture Lookup Functions
+    float texture (sampler1DShadow sampler, vec3 P [, float bias] )
+    float textureProj (sampler1DShadow sampler, vec4 P [, float bias] )
+    float textureLod (sampler1DShadow sampler, vec3 P, float lod)
+    float textureOffset (sampler2DRectShadow sampler, vec3 P, ivec2 offset )
+    gvec4 texelFetch (gsampler1D sampler, int P, int lod)
+    float textureProjOffset (sampler2DRectShadow sampler, vec4 P, ivec2 offset )
+    float textureLodOffset (sampler1DShadow sampler, vec3 P, float lod, int offset)
+    float textureProjLod (sampler1DShadow sampler, vec4 P, float lod)
+    float textureProjLodOffset (sampler1DShadow sampler, vec4 P, float lod, int offset)
+    float textureGrad (sampler2DRectShadow sampler, vec3 P, vec2 dPdx, vec2 dPdy)
+    float textureGradOffset (sampler2DRectShadow sampler, vec3 P, vec2 dPdx, vec2 dPdy, ivec2 offset)
+    float textureProjGrad (sampler2DRectShadow sampler, vec4 P, vec2 dPdx, vec2 dPdy)
+    float textureProjGradOffset (sampler2DRectShadow sampler,
+                                 vec4 P,
+                                 vec2 dPdx, vec2 dPdy, ivec2 offset)
+    // Texture Gather Functions
+    vec4 textureGather(sampler2DShadow sampler, vec2 P, float refZ)
+    vec4 textureGatherOffset(sampler2DShadow sampler, vec2 P, float refZ, ivec2 offset)
+// 8.8 Fragment Processing Functions
+    // Derivative Functions
+    genType dFdx (genType p);
+    genType dFdy (genType p);
+    genType dFdxFine (genType p);
+    genType dFdyFine (genType p);
+    genType dFdxCoarse (genType p);
+    genType dFdyCoarse (genType p);
+    genType fwidth (genType p);// Returns abs (dFdx (p)) + abs (dFdy (p)).
+    genType fwidthFine (genType p);// Returns abs(dFdxFine(p)) + abs(dFdyFine(p)).
+    genType fwidthCoarse (genType p);
+    genType dFdxCoarse (genType p);
+    genType dFdyCoarse (genType p);
+    genType fwidth (genType p);// Returns abs (dFdx (p)) + abs (dFdy (p)).
+    genType fwidthFine (genType p);// Returns abs(dFdxFine(p)) + abs(dFdyFine(p)).
+    genType fwidthCoarse (genType p);// Returns abs(dFdxCoarse(p)) + abs(dFdyCoarse(p)).
+    // Interpolation Functions
+    float interpolateAtCentroid (float interpolant);
+    float interpolateAtSample (float interpolant, int sample);
+    float interpolateAtOffset (float interpolant, vec2 offset);
+    vec2 interpolateAtCentroid (vec2 interpolant)
+    vec3 interpolateAtCentroid (vec3 interpolant)
+    vec4 interpolateAtCentroid (vec4 interpolant)
+    vec2 interpolateAtSample (vec2 interpolant, int sample)
+    vec3 interpolateAtSample (vec3 interpolant, int sample)
+    vec4 interpolateAtSample (vec4 interpolant, int sample)
+    vec2 interpolateAtOffset (vec2 interpolant, vec2 offset)
+    vec3 interpolateAtOffset (vec3 interpolant, vec2 offset)
+    vec4 interpolateAtOffset (vec4 interpolant, vec2 offset)
+// 8.9 Noise Functions
+float noise1 (genType x);// Returns a 1D noise value based on the input value x.
+vec2 noise2 (genType x);// Returns a 2D noise value based on the input value x.
+vec3 noise3 (genType x);// Returns a 3D noise value based on the input value x.
+vec4 noise4 (genType x);// Returns a 4D noise value based on the input value x.
+// 8.10 Geometry Shader Functions
+void EmitStreamVertex (int stream);
+void EndStreamPrimitive (int stream);
+void EmitVertex ();
+void EndPrimitive ();
+```
+
+纹理函数分为以下几种：
+
+- Texture Query Functions
+- Texel Lookup Functions
+- Texture Gather Functions
+
+虽然，在 GLSL 4.0 中声明废弃了大量名字包含 1D/2D/3D/Cube 字样的纹理函数，如  *texture1D*。但是在后续版本中，还是将它们归为 Compatibility Profile Texture Functions。
+
+纹理查询函数 *textureSize* 查询指定精细级别的纹理尺寸，*textureQueryLod* 只用于片段着色器，获取 LOD - Level of Detail 信息。
+
+片段着色器处理函数有两类，偏导函数（头皮发麻）和插值函数：
+
+- Derivative Functions
+- Interpolation Functions
+
+导数可能在计算上很消耗硬件资源，或在数值上不稳定。因此，OpenGL 实现可以通过使用快速但不完全精确的导数计算来近似真实导数。在非均匀控制流中未定义导数。使用 forward/backward differencing 指定导数的预期行为。
+
+在 GLSL 4.4 版本后弃用了 noise1, noise2, noise3, noise4 等噪点函数，它们只返回 0.0 值或向量。与之前的版本一样，它们在语义上不被认为是编译时常量表达式。
+
+GLSLangSpec.4.60 比旧版本规范新增了大量内置函数，以下是各个规范文档的内置函数目录部分对比，前面两个版本分别对应 OpenGL 2.0 和 3.0：
+
+    | 1.1 | 1.3 | 3.3 | 4.0 |4.5 | 4.6 |                    Contents                   |
+    |-----|-----|-----|-----|----|-----|-----------------------------------------------|
+    | ✔  | ✔ | ✔ | ✔ | ✔ | ✔  | 8.1. Angle and Trigonometry Functions         |
+    | ✔  | ✔ | ✔ | ✔ | ✔ | ✔  | 8.2. Exponential Functions                    |
+    | ✔  | ✔ | ✔ | ✔ | ✔ | ✔  | 8.3. Common Functions                         |
+    | ❌  | ❌ | ❌ | ✔ | ✔ | ✔  | 8.4. Floating-Point Pack and Unpack Functions |
+    | ✔  | ✔ | ✔ | ✔ | ✔ | ✔  | 8.5. Geometric Functions                      |
+    | ✔  | ✔ | ✔ | ✔ | ✔ | ✔  | 8.6. Matrix Functions                         |
+    | ✔  | ✔ | ✔ | ✔ | ✔ | ✔  | 8.7. Vector Relational Functions              |
+    | ❌  | ❌ | ❌ | ✔ | ✔ | ✔  | 8.8. Integer Functions                        |
+    | ✔  | ✔ | ✔ | ✔ | ✔ | ✔  | 8.9. Texture Functions                        |
+    | ❌  | ❌ | ❌ | ❌ | ✔ | ✔  | 8.10. Atomic Counter Functions                |
+    | ❌  | ❌ | ❌ | ❌ | ✔ | ✔  | 8.11. Atomic Memory Functions                 |
+    | ❌  | ❌ | ❌ | ❌ | ✔ | ✔  | 8.12. Image Functions                         |
+    | ❌  | ❌ | ✔ | ✔ | ✔ | ✔  | 8.13. Geometry Shader Functions               |
+    | ✔  | ✔ | ✔ | ✔ | ✔ | ✔  | 8.14. Fragment Processing Functions           |
+    | ✔  | ✔ | ✔ | ✔ | ✔ | ✔  | 8.15. Noise Functions                         |
+    | ❌  | ❌ | ❌ | ✔ | ✔ | ✔  | 8.16. Shader Invocation Control Functions     |
+    | ❌  | ❌ | ❌ | ❌ | ✔ | ✔  | 8.17. Shader Memory Control Functions         |
+    | ❌  | ❌ | ❌ | ❌ | ❌ | ✔  | 8.18. Subpass-Input Functions                 |
+    | ❌  | ❌ | ❌ | ❌ | ❌ | ✔  | 8.19. Shader Invocation Group Functions       |
+
+
+GLSL 和其 C/C++ 等编程语言一样有数据类型，如 *int*, *float*, *double*, *uint*, *bool*，也有数组、结构体，条件判断、循环控件等等，运算符也类似。
+
+预处理器使用的运算符：
+
+    |  Precedence |       Operator class       |    Operators    | Associativity |
+    |-------------|----------------------------|-----------------|---------------|
+    | 1 (highest) | parenthetical grouping     | ( )             | NA            |
+    | 2           | unary                      | defined + - ~ ! | Right to Left |
+    | 3           | multiplicative             | * / %           | Left to Right |
+    | 4           | additive                   | + -             | Left to Right |
+    | 5           | bit-wise shift             | << >>           | Left to Right |
+    | 6           | relational                 | < > <= >=       | Left to Right |
+    | 7           | equality                   | == !=           | Left to Right |
+    | 8           | bit-wise and               | &               | Left to Right |
+    | 9           | bit-wise exclusive or      | ^               | Left to Right |
+    | 10          | bit-wise inclusive or      | |               | Left to Right |
+    | 11          | logical and                | &&              | Left to Right |
+    | 12 (lowest) | logical inclusive or       | ||              | Left to Right |
+
+通用运算符：
+
+    |  Precedence |              Operator Class             | Operators  | Associativity |
+    |-------------|-----------------------------------------|------------|---------------|
+    | 1 (highest) | parenthetical grouping                  | ( )        | NA            |
+    |-------------|-----------------------------------------|------------|---------------|
+    | 2           | array subscript                         | [ ]        | Left to Right |
+    |             | function call and constructor structure | ( )        |               |
+    |             | field or method selector, swizzler      | .          |               |
+    |             | post fix increment and decrement        | ++ --      |               |
+    |-------------|-----------------------------------------|------------|---------------|
+    | 3           | prefix increment and decrement unary    | ++ --      | Right to Left |
+    |             |                                         | + - ~ !    |               |
+    |-------------|-----------------------------------------|------------|---------------|
+    | 4           | multiplicative                          | * / %      | Left to Right |
+    | 5           | additive                                | + -        | Left to Right |
+    | 6           | bit-wise shift                          | << >>      | Left to Right |
+    | 7           | relational                              | < > <= >=  | Left to Right |
+    | 8           | equality                                | == !=      | Left to Right |
+    | 9           | bit-wise and                            | &          | Left to Right |
+    | 10          | bit-wise exclusive or                   | ^          | Left to Right |
+    | 11          | bit-wise inclusive or                   | |          | Left to Right |
+    | 12          | logical and                             | &&         | Left to Right |
+    | 13          | logical exclusive or                    | ^^         | Left to Right |
+    | 14          | logical inclusive or                    | ||         | Left to Right |
+    | 15          | selection                               | ? :        | Right to Left |
+    |-------------|-----------------------------------------|------------|---------------|
+    | 16          | Assignment arithmetic assignments       | =          | Right to Left |
+    |             |                                         | += -=      |               |
+    |             |                                         | *= /=      |               |
+    |             |                                         | %= <<= >>= |               |
+    |             |                                         | &= ^= |=   |               |
+    |-------------|-----------------------------------------|------------|---------------|
+    | 17 (lowest) | sequence                                | ,          | Left to Righ  |
+
 
 Table 2.1 Basic Data Types in GLSL
 
@@ -1580,7 +1901,7 @@ Table 2.1 Basic Data Types in GLSL
 
 所以，在渲染管线中，如果从 A 着色器向 B 着色器发送数据，必须在 A 着色器中声明输出变量，并在接收方 B 着色器中声明一个相同的输入变量。当类型和名字都一样的时候，数据就会从上一级着色器的 `out` 变量流向下一级着色器的 `in` 变量。
 
-着色器中使用的像 gl_Position 这样以 gl 开头的都是内置常量或变量，参考 The OpenGL® Shading Language, v4.60.7 - Chapter 7. Built-In Variables。
+着色器中使用的像 *gl_Position* 这样以 gl 开头的都是内置常量或变量，参考 The OpenGL® Shading Language, v4.60.7 - Chapter 7. Built-In Variables。
 
 根据不同阶段使用着色器，可用内置变量也不相同：
 
@@ -1720,6 +2041,8 @@ GLSL Type Modifiers：
 - *buffer* 标记应用程序读写的内存块，它会被着色器程序引用。
 - *shared* 标记变量在本地工作组共享，只在计算着色器时用建立内存共享。
 
+补充一个在 OpenGL 1.3 版本开始标记为 deprecated 的存储修饰 `varying`，它用来链接顶点着色器与片段着色器的数据插值，相当顶点着色器的 *out* 变量，和片段着色器的 *in* 变量。存储的是顶点着色器的输出，同时作为片段着色器的输入。顶点着色器把需要传递给片段着色器的数据存储在一个或多个 varying 变量中，这些变量在片段着色器中需要有相对应的声明且数据类型一致，然后在光栅化过程中进行插值计算。
+
 在渲染流水线上，不同的着色器会按顺序进行工作，着色器前后存在数据输入输出，这样所有着色器才能串联起来完成一项完整的渲染工作。
 
 此外，还扩展的指令修饰符，如 require、enabled、disable、warn 等。
@@ -1734,6 +2057,8 @@ Uniform 代码块可以使用 Layout 修饰符：
 - *std430* 使用 GLSL Version 4.30 标准布局。
 - *row_major* 使用 uniform block 中的矩阵在行主序元素共享。
 - *column_major* 使用 uniform block 中的矩阵在列主序元素共享，默认方式。
+
+GLSL 还有两个容器类型向量和矩阵 vectors and matrices。
 
 GLSL 中的向量是一个可以包含有 1、2、3 或者 4 个分量的容器，分量的类型可以是默认基础类型，也可以是下面的形式，n 代表分量的数量：
 

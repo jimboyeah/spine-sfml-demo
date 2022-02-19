@@ -8,8 +8,28 @@ using namespace std;
 // with C++20 to support using enum XXX
 // using enum sf::Event::EventType;
 
+#define Max_Button 15
 int main()
 {
+    char *ButtonNames[] = {
+    "0  - GAMEPAD_BUTTON_A or GAMEPAD_BUTTON_CROSS",
+    "1  - GAMEPAD_BUTTON_B or GAMEPAD_BUTTON_CIRCLE",
+    "2  - GAMEPAD_BUTTON_X or GAMEPAD_BUTTON_SQUARE",
+    "3  - GAMEPAD_BUTTON_Y or GAMEPAD_BUTTON_TRIANGLE",
+    "4  - GAMEPAD_BUTTON_LEFT_BUMPER",
+    "5  - GAMEPAD_BUTTON_RIGHT_BUMPER",
+    "6  - GAMEPAD_BUTTON_BACK",
+    "7  - GAMEPAD_BUTTON_START",
+    "8  - GAMEPAD_BUTTON_GUIDE",
+    "9  - GAMEPAD_BUTTON_LEFT_THUMB",
+    "10 - GAMEPAD_BUTTON_RIGHT_THUMB",
+    "11 - GAMEPAD_BUTTON_DPAD_UP",
+    "12 - GAMEPAD_BUTTON_DPAD_RIGHT",
+    "13 - GAMEPAD_BUTTON_DPAD_DOWN",
+    "14 - GAMEPAD_BUTTON_DPAD_LEFT or GAMEPAD_BUTTON_LAST",
+    "Unknown"
+    };
+
     sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Red);
@@ -76,13 +96,19 @@ int main()
             }
             else if (event.type == sf::Event::JoystickButtonPressed)
             {
+                unsigned int button = event.joystickButton.button;
+                if(button>Max_Button) button = Max_Button;
                 cout << "JoystickButtonPressed: " << endl
-                     << "         button index: " << event.joystickButton.button << endl;
+                     << "         button index: " << button << endl
+                     << "         button  name: " << ButtonNames[button] << endl;
             }
             else if (event.type == sf::Event::JoystickButtonReleased)
             {
+                unsigned int button = event.joystickButton.button;
+                if(button>Max_Button) button = Max_Button;
                 cout << "JoystickButtonReleased: " << endl
-                     << "          button index: " << event.joystickButton.button << endl;
+                     << "          button index: " << button << endl
+                     << "          button  name: " << ButtonNames[button] << endl;
             }
             else if (event.type == sf::Event::MouseEntered)
             {

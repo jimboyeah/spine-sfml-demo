@@ -151,7 +151,7 @@
 			[
 				{
 					"name": "Ninja - all",
-					"shell_cmd": "%VCVARS64% x64 && ninja.exe -f build.ninja all && sfml_${file_base_name} & echo Done!",
+					"shell_cmd": "%VCVARS64% x64 && ninja.exe -f build.ninja all && ${file_base_name} & echo Done!",
 				},
 				{
 					"name": "CMake install",
@@ -199,10 +199,46 @@
 			"path": "dependencies\\OpenGLInsightsCode\\Chapter 15 Depth of Field with Bokeh Rendering\\src\\external\\devil-1.7.8",
 		},
 		{
-			"path": "C:\\download\\OpenCV\\freeglut-3.2.1",
+			"path": "C:\\download\\OpenCV\\glad-master",
 		},
 		{
-			"path": "C:\\download\\OpenCV\\glad-master"
+			"path": "dependencies\\glm",
+		},
+		{
+			"path": "C:\\VulkanSDK",
+		},
+		{
+			"path": "C:\\download\\books\\vulkan\\imgui",
+		},
+		{
+			"path": "C:\\download\\books\\vulkan\\IntroductionToVulkan",
+		},
+		{
+			"path": "C:\\download\\books\\vulkan\\sdk-1.2.198.1",
+		},
+		{
+			"path": "C:\\download\\books\\vulkan\\Vulkan-Docs",
+		},
+		{
+			"path": "C:\\download\\books\\vulkan\\Vulkan-Guide",
+		},
+		{
+			"path": "C:\\download\\books\\vulkan\\Vulkan-Loader",
+		},
+		{
+			"path": "C:\\download\\books\\vulkan\\VulkanSamples",
+		},
+		{
+			"path": "C:\\download\\books\\vulkan\\Vulkan-Samples",
+		},
+		{
+			"path": "C:\\download\\books\\vulkan\\VulkanTutorial",
+		},
+		{
+			"path": "dependencies\\glfw-3.3.6",
+		},
+		{
+			"path": "dependencies\\freeglut-3.2.2"
 		},
 	],
 }

@@ -12,6 +12,8 @@ target
 *.swp
 *.user
 *.zip
+*.tar
+*.gz
 *.sublime-workspace
 *.stackdump
 .DS_Store

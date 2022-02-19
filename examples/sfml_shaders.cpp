@@ -37,73 +37,84 @@ string codeFS =
 "       gl_FragColor = gl_Color * pixel;                         \n"\
 "   }                                                            \n";
 
+#define ERROR_MSG(msg) ("Error: " msg ": " __FILE__ ":"+to_string(__LINE__)).c_str()
+
 int main() try
 {
     sf::RenderWindow window(sf::VideoMode(2000, 1080), "SFML works!");
 
-    char *texturePath = "cpp\\data\\owel-pma.png";
-    char *texturePath2 = "cpp\\data\\mix-and-match-pma.png";
+    char *texturePath = "cpp/data/owl-pma.png";
+    char *texturePath2 = "cpp/data/mix-and-match-pma.png";
+
+    char *vert_sfml_tutorials  = "../examples/sfml_tutorials_shader.vert";
+    char *frag_sfml_tutorials  = "../examples/sfml_tutorials_shader.frag";
+    char *vert_sfml_essentials = "../examples/sfml_essentials_ch6.vert";
+    char *frag_sfml_essentials = "../examples/sfml_essentials_ch6.frag";
+    char *vert_opengl_insights = "../examples/opengl_insights_ch1.vert";
+    char *frag_opengl_insights = "../examples/opengl_insights_ch1.frag";
+    char *frag_opengl_insights_smooth = "../examples/opengl_insights_ch1_smooth.frag";
 
     sf::Texture texture;
-    if(!texture.loadFromFile(texturePath)){
-        cout << __FILE__ << "(" << __LINE__ << "): error C0000: Texture::loadFromFile: " 
-             << texturePath << endl;
-    }
+    if(!texture.loadFromFile(texturePath))
+        throw ERROR_MSG(+string("Texture::loadFromFile: ")+texturePath+);
 
     sf::Texture texture2 = AssetManager::GetTexture(texturePath2);
-    // create a quad
-    sf::VertexArray quad(sf::Quads, 4);
 
+    sf::VertexArray quad(sf::Quads, 4);
     // define a primitive shape, located at (-280, -260) and with size 560x520
     quad[0].position = sf::Vector2f(-280.f,-260.f);
     quad[1].position = sf::Vector2f( 280.f,-260.f);
     quad[2].position = sf::Vector2f( 280.f, 260.f);
     quad[3].position = sf::Vector2f(-280.f, 260.f);
-
     // define its texture area to be a 250x210 pixels rectangle starting at (0, 0)
     quad[0].texCoords = sf::Vector2f(   0.f,   0.f);
     quad[1].texCoords = sf::Vector2f( 250.f,   0.f);
     quad[2].texCoords = sf::Vector2f( 250.f, 210.f);
     quad[3].texCoords = sf::Vector2f(   0.f, 210.f);
 
-    sf::RenderStates statesLeft;
-    sf::RenderStates statesRight;
-    statesLeft.transform.translate(2000/2-500, 1080/2);
-    statesRight.transform.translate(2000/2+500, 1080/2);
-
     sf::Transform toRotate;
     toRotate.rotate(0.05f, 0, 0);
-    statesLeft.texture = &texture;
 
-    if (!sf::Shader::isAvailable()){
-        // error
-    }
+    if (!sf::Shader::isAvailable()) 
+        throw ERROR_MSG("Shader unavailable.");
+
+    sf::RenderStates statesLeft;
+    statesLeft.transform.translate(2000/2-500, 1080/2);
 
     sf::Shader shader;
     statesLeft.shader = &shader;
+    statesLeft.texture = &texture;
+    // shader.setUniform("uTexture", texture);
 
-    shader.loadFromMemory(codeVS, codeFS);
+    // shader.loadFromFile(vert_opengl_insights, frag_opengl_insights_smooth);
+    shader.loadFromFile(vert_sfml_tutorials, frag_sfml_tutorials);
+    // shader.loadFromMemory(codeVS, codeFS);
     // shader.loadFromMemory(codeVS, sf::Shader::Type::Vertex);
     // shader.loadFromMemory(codeFS, sf::Shader::Type::Fragment);
+    shader.setUniform("d", 1);
+    shader.setUniform("image", texture);
+    
 
-    char *vertShader = "../examples/sfml_essentials_ch6.vert";
-    char *fragShader = "../examples/sfml_essentials_ch6.frag";
-    sf::Shader *shaderRight = new sf::Shader();
-    shaderRight->loadFromFile(vertShader, fragShader);
+    // sf::Shader *shaderRight = new sf::Shader();
+    // shaderRight->loadFromFile(vert_sfml_tutorials, frag_sfml_tutorials);
+    // sf::Shader *shaderRight = AssetManager::GetShader(vert_sfml_tutorials, frag_sfml_tutorials);
+    sf::Shader *shaderRight = AssetManager::GetShader(vert_sfml_essentials, frag_sfml_essentials);
+
     // shaderRight->setUniform("uTexture", texture);
-    shaderRight->setUniform("uTexture", sf::Shader::CurrentTexture);
+    // shaderRight->setUniform("uTexture", sf::Shader::CurrentTexture);
     // sf::Shader::bind(&shaderRight);
+    // shaderRight->setUniform("uTexture", *sprite.getTexture());
+    // shaderRight->setUniform("uPositionFreq", 0.1f);
+    // shaderRight->setUniform("uSpeed", 20.0f);
+    // shaderRight->setUniform("uStrength", 0.03f);
 
-    // sf::Shader *shaderRight = AssetManager::GetShader(vertShader, fragShader);
     sf::Sprite sprite(AssetManager::GetTexture(texturePath));
     sprite.setColor(sf::Color(255, 128, 255, 192));
+
+    sf::RenderStates statesRight;
+    statesRight.transform.translate(2000/2+500, 1080/2);
     statesRight.shader = shaderRight;
     statesRight.texture = sprite.getTexture();
-
-    shaderRight->setUniform("uTexture", *sprite.getTexture());
-    shaderRight->setUniform("uPositionFreq", 0.1f);
-    shaderRight->setUniform("uSpeed", 20.0f);
-    shaderRight->setUniform("uStrength", 0.03f);
 
     sf::Clock clock;
     bool enableRotate = true;
@@ -129,7 +140,7 @@ int main() try
 
         window.clear();
 
-        shaderRight->setUniform("uTime", clock.getElapsedTime().asSeconds());
+        // shaderRight->setUniform("uTime", clock.getElapsedTime().asSeconds());
 
         if (enableRotate)
         {
@@ -143,8 +154,12 @@ int main() try
     }
     return 0;
 }
-catch (ErrorLoading what)
+catch (const char *ex)
 {
-    cout << "what happen to?" << what << endl;
+    cout << "what happen to? " << ex << endl;
+}
+catch (exception &ex)
+{
+    cout << "what happen to? " << ex.what() << endl;
 } // C++ function-try-block
 
