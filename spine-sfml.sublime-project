@@ -235,10 +235,13 @@
 			"path": "C:\\download\\books\\vulkan\\VulkanTutorial",
 		},
 		{
+			"path": "C:\\download\\books\\vulkan\\Vulkan-ValidationLayers",
+		},
+		{
 			"path": "dependencies\\glfw-3.3.6",
 		},
 		{
-			"path": "dependencies\\freeglut-3.2.2"
+			"path": "dependencies\\freeglut-3.2.2",
 		},
 	],
 }

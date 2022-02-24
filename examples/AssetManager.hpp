@@ -67,7 +67,7 @@ AssetManager *AssetManager::sInstance = new AssetManager();
 
 AssetManager::AssetManager()
 {
-    assert(self == nullptr);
+    // assert(self == nullptr);
     // Error: never new a Singleton
     sInstance = this;
 }

@@ -19,7 +19,6 @@ IF(MINGW)
     set(SFML_VER "SFML-2.4.1-mingw-gcc6.1-32-bit")
 ENDIF(MINGW)
 
-
 # include_directories("c:/VulkanSDK/1.2.198.1/Include")
 # include_directories("c:/VulkanSDK/1.2.198.1/Lib")
 
@@ -98,7 +97,7 @@ include_directories(${SFML_INCLUDE_DIR})
 find_package(FreeGLUT)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 # gcc -Wl,--subsystem,windows
 # set(CMAKE_EXE_LINKER_FLAGS "/subsystem:windows")
@@ -108,12 +107,13 @@ set(CMAKE_BUILD_TYPE Release)
 # set(CMAKE_CXX_FLAGS "/MT")
 # set(CMAKE_CXX_FLAGS_RELEASE "/MT")
 # add_definitions("/MT")
-add_compile_options(/MT)
+add_compile_options(/MTd)
 
 
 string(TOLOWER ${CMAKE_BUILD_TYPE} BUILDTYPE)
 if("${BUILDTYPE}" STREQUAL "release")
     set(BUILDTYPE "optimized")
+    add_compile_options(/MT)
 endif()
 foreach(item ${SFML_LIBRARIES})
     if("${LASTITEM}" STREQUAL "${BUILDTYPE}" )
