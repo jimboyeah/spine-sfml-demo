@@ -1,5 +1,8 @@
 /********************************************************
-** https://vulkan-tutorial.com/code/00_base_code.cpp
+ * https://vulkan-tutorial.com/code/00_base_code.cpp
+ * https://vulkan-tutorial.com/code/01_instance_creation.cpp
+ * https://vulkan-tutorial.com/code/02_validation_layers.cpp
+ * 
 *********************************************************/
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -90,6 +93,9 @@ private:
     }
 
     void cleanup() {
+        if (enableValidationLayers) {
+            DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+        }
         vkDestroyInstance(instance, nullptr);
         glfwDestroyWindow(window);
 
@@ -165,11 +171,13 @@ private:
 
         std::vector<VkLayerProperties> availableLayers(layerCount);
         vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
+        std::cout << "LayersCount: " << availableLayers.size() << " " << layerCount << std::endl;
 
         for (const char* layerName : validationLayers) {
             bool layerFound = false;
 
             for (const auto& layerProperties : availableLayers) {
+                std::cout << "\t" << layerProperties.layerName << std::endl;
                 if (strcmp(layerName, layerProperties.layerName) == 0) {
                     layerFound = true;
                     break;
