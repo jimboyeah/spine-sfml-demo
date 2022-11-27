@@ -1,15 +1,17 @@
 cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
 
-option(UseMSVC "Using MSVC Compiler" ON)
-if(UseMSVC)
-    set(CMAKE_C_COMPILER cl.exe)
-    set(CMAKE_CXX_COMPILER cl.exe)
-    set(CMAKE_RC_COMPILER rc.exe)
-    set(SFML_VER "SFML-2.4.1") # -vc14-64-bit
-endif()
-
 project(SFML_Win32 CXX)
 cmake_policy(SET CMP0074 NEW)
+
+set(CMAKE_CXX_STANDARD 17)
+
+option(UseMSVC "Using MSVC Compiler" ON)
+if(UseMSVC)
+    # set(CMAKE_C_COMPILER cl.exe)
+    # set(CMAKE_CXX_COMPILER cl.exe)
+    # set(CMAKE_RC_COMPILER rc.exe)
+    set(SFML_VER "SFML-2.4.1") # -vc14-64-bit
+endif()
 
 option(MINGW "Using MinGW Library file name rule" OFF)
 IF(MINGW)
@@ -18,9 +20,6 @@ IF(MINGW)
     add_definitions(-D_WIN32)
     set(SFML_VER "SFML-2.4.1-mingw-gcc6.1-32-bit")
 ENDIF(MINGW)
-
-# include_directories("c:/VulkanSDK/1.2.198.1/Include")
-# include_directories("c:/VulkanSDK/1.2.198.1/Lib")
 
 
 set(DEPS_DIR "${PROJECT_SOURCE_DIR}/dependencies/")
@@ -156,6 +155,7 @@ add_sfml_executable(sfml_sprite examples/sfml_sprite.cpp)
 add_sfml_executable(sfml_vertices examples/sfml_vertices.cpp)
 add_sfml_executable(sfml_particles examples/sfml_particles.cpp)
 add_sfml_executable(sfml_shaders examples/sfml_shaders.cpp)
+add_sfml_executable(sfml_recorder examples/sfml_recorder.cpp)
 
 add_executable(cpp_friends examples/cpp_friends.cpp)
 add_executable(cpp_fileio examples/cpp_fileio.cpp)
@@ -170,6 +170,7 @@ add_executable(cpp_mi_virtual examples/cpp_mi_virtual.cpp)
 add_executable(cpp_multiple_inheritance examples/cpp_multiple_inheritance.cpp)
 add_executable(cpp_xman examples/cpp_xman.cpp)
 add_executable(cpp_static_polymorphism examples/cpp_static_polymorphism.cpp)
+add_executable(cpp_cast_operator examples/cpp_cast_operator.cpp)
 
 add_glut_executable(freeglut_opengl examples/freeglut_opengl.cpp)
 add_glfw_executable(glfw_base examples/glfw_base.cpp)
